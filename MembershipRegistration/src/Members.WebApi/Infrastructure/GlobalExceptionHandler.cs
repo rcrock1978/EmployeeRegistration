@@ -19,9 +19,14 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (_logger.IsEnabled(LogLevel.Error))
+        var correlationId = httpContext.Items["CorrelationId"] as string ?? "N/A";
+
+        using (_logger.BeginScope(new Dictionary<string, object> { ["CorrelationId"] = correlationId }))
         {
-            _logger.LogError(exception, "Unhandled exception occurred.");
+            if (_logger.IsEnabled(LogLevel.Error))
+            {
+                _logger.LogError(exception, "Unhandled exception occurred for {Path}.", httpContext.Request.Path);
+            }
         }
 
         var problemDetails = new ProblemDetails

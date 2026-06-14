@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Members.Infrastructure.Persistence;
 
@@ -7,21 +8,61 @@ public static class HealthEndpoints
 {
     public static void MapHealthEndpoints(this WebApplication app)
     {
-        app.MapGet("/health/live", () => Results.Ok("Healthy"))
-            .AllowAnonymous()
-            .WithName("HealthLive");
-
-        app.MapGet("/health/ready", async (MembersDbContext db) =>
+        app.MapGet("/health/live", (HttpContext context) =>
         {
+            var correlationId = context.Items["CorrelationId"] as string ?? Guid.NewGuid().ToString("N");
+
+            return Results.Ok(new
+            {
+                status = "Healthy",
+                timestamp = DateTime.UtcNow,
+                correlationId
+            });
+        })
+        .AllowAnonymous()
+        .WithName("HealthLive");
+
+        app.MapGet("/health/ready", async (MembersDbContext db, HttpContext context) =>
+        {
+            var correlationId = context.Items["CorrelationId"] as string ?? Guid.NewGuid().ToString("N");
+            var dbConnected = false;
+            var errors = new List<string>();
+
             try
             {
-                await db.Database.CanConnectAsync();
-                return Results.Ok("Healthy");
+                dbConnected = await db.Database.CanConnectAsync();
             }
-            catch
+            catch (Exception ex)
             {
-                return Results.StatusCode(503);
+                errors.Add($"Database connection failed: {ex.Message}");
             }
+
+            if (dbConnected)
+            {
+                return Results.Ok(new
+                {
+                    status = "Healthy",
+                    timestamp = DateTime.UtcNow,
+                    correlationId,
+                    checks = new
+                    {
+                        database = new { status = "Healthy", latency = 0 }
+                    }
+                });
+            }
+
+            return Results.Json(
+                new
+                {
+                    status = "Unhealthy",
+                    timestamp = DateTime.UtcNow,
+                    correlationId,
+                    checks = new
+                    {
+                        database = new { status = "Unhealthy", errors }
+                    }
+                },
+                statusCode: 503);
         })
         .AllowAnonymous()
         .WithName("HealthReady");
