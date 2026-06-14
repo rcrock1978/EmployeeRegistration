@@ -4,6 +4,7 @@ using Members.Application.Features.Members.ListMembers;
 using Members.Application.Features.Members.RegisterMember;
 using Members.Application.Features.Members.UpdateMember;
 using Members.Application.Common.Messaging;
+using Members.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Members.WebApi.Endpoints;
@@ -52,8 +53,15 @@ public static class MembersEndpoints
         app.MapGet("/api/members/{id:guid}", async (
             Guid id,
             [FromServices] ISender sender,
+            [FromServices] MemberOwnerAuthorizationFilter ownerFilter,
             CancellationToken cancellationToken) =>
         {
+            var isAuthorized = await ownerFilter.IsOwnerOrAdminAsync(id, cancellationToken);
+            if (!isAuthorized)
+            {
+                return Results.Forbid();
+            }
+
             var query = new GetMemberByIdQuery(id);
             var result = await sender.Send(query, cancellationToken);
 
@@ -74,7 +82,7 @@ public static class MembersEndpoints
                 error = result.Error
             });
         })
-        .RequireAuthorization("MemberOrHRAdmin")
+        .RequireAuthorization()
         .WithName("GetMemberById");
 
         app.MapGet("/api/members", async (

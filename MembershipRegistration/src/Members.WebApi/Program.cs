@@ -26,6 +26,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<Members.Domain.Members.IMemberRepository, Members.Infrastructure.Persistence.MemberRepository>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<MemberOwnerAuthorizationFilter>();
 
 var encryptionOptions = builder.Configuration
     .GetSection(EncryptionOptions.SectionName)
