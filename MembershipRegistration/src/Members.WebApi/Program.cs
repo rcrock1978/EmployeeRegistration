@@ -1,10 +1,14 @@
+using System.Text;
 using FluentValidation;
+using Members.Application.Common;
 using Members.Application.Common.Behaviors;
 using Members.Application.Common.Messaging;
 using Members.Infrastructure.Persistence;
 using Members.WebApi.Endpoints;
 using Members.WebApi.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,11 +23,52 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<Members.Domain.Members.IMemberRepository, Members.Infrastructure.Persistence.MemberRepository>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 builder.Services.AddDbContext<MembersDbContext>((sp, options) =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"))
         .AddInterceptors(sp.GetRequiredService<AuditInterceptor>()));
+
+var authOptions = builder.Configuration
+    .GetSection(AuthOptions.SectionName)
+    .Get<AuthOptions>() ?? new AuthOptions();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        if (authOptions.UseDevelopmentKey)
+        {
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(authOptions.DevelopmentSigningKey));
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+                ClockSkew = TimeSpan.FromMinutes(authOptions.TokenValidationClockSkewMinutes)
+            };
+        }
+        else
+        {
+            options.Authority = authOptions.Authority;
+            options.Audience = authOptions.Audience;
+            options.MetadataAddress = authOptions.MetadataUrl;
+            options.RequireHttpsMetadata = authOptions.RequireHttpsMetadata;
+            options.TokenValidationParameters.ClockSkew =
+                TimeSpan.FromMinutes(authOptions.TokenValidationClockSkewMinutes);
+        }
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("HRAdminOnly", policy =>
+        policy.RequireRole("HRAdmin"));
+    options.AddPolicy("MemberOrHRAdmin", policy =>
+        policy.RequireAuthenticatedUser());
+});
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(Members.Application.Common.Results.Result).Assembly);
@@ -54,6 +99,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthEndpoints();
 app.MapMembersEndpoints();

@@ -1,17 +1,17 @@
+using Members.Application.Common;
 using Members.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 
 namespace Members.Infrastructure.Persistence;
 
 public sealed class AuditInterceptor : SaveChangesInterceptor
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICurrentUserService _currentUserService;
 
-    public AuditInterceptor(IHttpContextAccessor httpContextAccessor)
+    public AuditInterceptor(ICurrentUserService currentUserService)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _currentUserService = currentUserService;
     }
 
     public override InterceptionResult<int> SavingChanges(
@@ -35,7 +35,7 @@ public sealed class AuditInterceptor : SaveChangesInterceptor
     {
         if (context is null) return;
 
-        var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+        var userId = _currentUserService.UserId ?? "system";
         var now = DateTime.UtcNow;
 
         foreach (var entry in context.ChangeTracker.Entries<AuditableEntity>())

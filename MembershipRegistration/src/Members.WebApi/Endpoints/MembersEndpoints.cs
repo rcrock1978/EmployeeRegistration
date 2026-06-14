@@ -45,5 +45,35 @@ public static class MembersEndpoints
         })
         .AllowAnonymous()
         .WithName("RegisterMember");
+
+        app.MapGet("/api/members/{id:guid}", async (
+            Guid id,
+            [FromServices] ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            return Results.Ok(new { isSuccess = true, value = (object?)null, error = (object?)null });
+        })
+        .RequireAuthorization("MemberOrHRAdmin")
+        .WithName("GetMemberById");
+
+        app.MapGet("/api/members", async (
+            [FromServices] ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            return Results.Ok(new { isSuccess = true, value = (object?)null, error = (object?)null });
+        })
+        .RequireAuthorization("HRAdminOnly")
+        .WithName("ListMembers");
+
+        app.MapPut("/api/members/{id:guid}", async (
+            Guid id,
+            [FromBody] object command,
+            [FromServices] ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            return Results.Ok(new { isSuccess = true, value = (object?)null, error = (object?)null });
+        })
+        .RequireAuthorization("HRAdminOnly")
+        .WithName("UpdateMember");
     }
 }
