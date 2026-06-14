@@ -62,4 +62,33 @@ public class Member : AuditableEntity
     {
         Status = newStatus;
     }
+
+    public void Update(
+        PersonName personName,
+        Demographics demographics,
+        ContactDetails contactDetails,
+        DependentInfo dependentInfo,
+        RelatedPersons relatedPersons,
+        GovernmentIds governmentIds,
+        PrimaryIdentification primaryIdentification,
+        Address currentAddress,
+        PermanentAddressInfo permanentAddress,
+        EmergencyContact emergencyContact,
+        EmploymentDetails employmentDetails,
+        Consent consent)
+    {
+        PersonName = personName;
+        Demographics = demographics;
+        ContactDetails = contactDetails;
+        EmailAddress = contactDetails.EmailAddress;
+        DependentInfo = dependentInfo;
+        RelatedPersons = relatedPersons;
+        GovernmentIds = governmentIds;
+        PrimaryIdentification = primaryIdentification;
+        CurrentAddress = currentAddress;
+        PermanentAddress = permanentAddress;
+        EmergencyContact = emergencyContact;
+        EmploymentDetails = employmentDetails;
+        Consent = consent;
+    }
 }

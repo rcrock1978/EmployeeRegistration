@@ -42,6 +42,46 @@ public sealed class MemberRepository : IMemberRepository
         return member;
     }
 
+    public async Task<PagedResult<MemberListItem>> ListAsync(
+        string? lastName, string? email, string? employeeLevel,
+        DateTime? createdDateFrom, DateTime? createdDateTo,
+        int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Set<Member>().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(lastName))
+            query = query.Where(m => m.PersonName.LastName.Contains(lastName));
+
+        if (!string.IsNullOrWhiteSpace(email))
+            query = query.Where(m => m.EmailAddress.Contains(email));
+
+        if (!string.IsNullOrWhiteSpace(employeeLevel))
+            query = query.Where(m => m.EmploymentDetails.EmployeeLevel == employeeLevel);
+
+        if (createdDateFrom.HasValue)
+            query = query.Where(m => m.CreatedOn >= createdDateFrom.Value);
+
+        if (createdDateTo.HasValue)
+            query = query.Where(m => m.CreatedOn <= createdDateTo.Value);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(m => m.CreatedOn)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(m => new MemberListItem(
+                m.Id,
+                m.PersonName.FirstName,
+                m.PersonName.LastName,
+                m.EmailAddress,
+                m.Status.ToString(),
+                m.CreatedOn))
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<MemberListItem>(items, totalCount, page, pageSize);
+    }
+
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return _context.SaveChangesAsync(cancellationToken);

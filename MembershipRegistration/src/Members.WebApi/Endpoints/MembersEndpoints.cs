@@ -1,5 +1,8 @@
 using Members.Application.Common.Results;
+using Members.Application.Features.Members.GetMemberById;
+using Members.Application.Features.Members.ListMembers;
 using Members.Application.Features.Members.RegisterMember;
+using Members.Application.Features.Members.UpdateMember;
 using Members.Application.Common.Messaging;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,27 +54,113 @@ public static class MembersEndpoints
             [FromServices] ISender sender,
             CancellationToken cancellationToken) =>
         {
-            return Results.Ok(new { isSuccess = true, value = (object?)null, error = (object?)null });
+            var query = new GetMemberByIdQuery(id);
+            var result = await sender.Send(query, cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                return Results.Ok(new
+                {
+                    isSuccess = true,
+                    value = result.Value,
+                    error = (object?)null
+                });
+            }
+
+            return Results.NotFound(new
+            {
+                isSuccess = false,
+                value = (object?)null,
+                error = result.Error
+            });
         })
         .RequireAuthorization("MemberOrHRAdmin")
         .WithName("GetMemberById");
 
         app.MapGet("/api/members", async (
             [FromServices] ISender sender,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            [FromQuery] string? lastName,
+            [FromQuery] string? email,
+            [FromQuery] string? employeeLevel,
+            [FromQuery] DateTime? createdDateFrom,
+            [FromQuery] DateTime? createdDateTo,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20) =>
         {
-            return Results.Ok(new { isSuccess = true, value = (object?)null, error = (object?)null });
+            var query = new ListMembersQuery(
+                lastName, email, employeeLevel,
+                createdDateFrom, createdDateTo,
+                page, pageSize);
+
+            var result = await sender.Send(query, cancellationToken);
+
+            return Results.Ok(new
+            {
+                isSuccess = true,
+                value = result.Value,
+                error = (object?)null
+            });
         })
         .RequireAuthorization("HRAdminOnly")
         .WithName("ListMembers");
 
         app.MapPut("/api/members/{id:guid}", async (
             Guid id,
-            [FromBody] object command,
+            [FromBody] UpdateMemberCommand command,
             [FromServices] ISender sender,
             CancellationToken cancellationToken) =>
         {
-            return Results.Ok(new { isSuccess = true, value = (object?)null, error = (object?)null });
+            if (id != command.Id)
+            {
+                return Results.BadRequest(new
+                {
+                    isSuccess = false,
+                    value = (object?)null,
+                    error = new AppError(
+                        "Validation.Mismatch",
+                        "The ID in the URL does not match the ID in the request body.")
+                });
+            }
+
+            var result = await sender.Send(command, cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                return Results.Ok(new
+                {
+                    isSuccess = true,
+                    value = result.Value,
+                    error = (object?)null
+                });
+            }
+
+            if (result.Error?.Code == "NotFound")
+            {
+                return Results.NotFound(new
+                {
+                    isSuccess = false,
+                    value = (object?)null,
+                    error = result.Error
+                });
+            }
+
+            if (result.Error?.Code == "Conflict.DuplicateEmail")
+            {
+                return Results.Conflict(new
+                {
+                    isSuccess = false,
+                    value = (object?)null,
+                    error = result.Error
+                });
+            }
+
+            return Results.BadRequest(new
+            {
+                isSuccess = false,
+                value = (object?)null,
+                error = result.Error
+            });
         })
         .RequireAuthorization("HRAdminOnly")
         .WithName("UpdateMember");
