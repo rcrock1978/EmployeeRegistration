@@ -19,6 +19,8 @@ export const personalInfoSchema = z.object({
   religion: z.string().optional(),
   highestEducationalAttainment: z.string().min(1),
   numberOfDependents: z.number().int().min(0),
+  email: z.string().min(1).email("Invalid email address"),
+  contactNumber: z.string().min(1, "Contact number is required"),
 });
 
 export const familySchema = z.object({

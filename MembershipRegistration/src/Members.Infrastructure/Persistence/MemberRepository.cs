@@ -1,15 +1,22 @@
 using Members.Domain.Members;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Members.Infrastructure.Persistence;
 
 public sealed class MemberRepository : IMemberRepository
 {
-    private readonly MembersDbContext _context;
+    private static readonly Action<ILogger, Guid, Exception?> LogSensitiveDataAccess =
+        LoggerMessage.Define<Guid>(LogLevel.Information, new EventId(1, "SensitiveDataAccessed"),
+            "Sensitive data accessed: Member {MemberId}");
 
-    public MemberRepository(MembersDbContext context)
+    private readonly MembersDbContext _context;
+    private readonly ILogger<MemberRepository> _logger;
+
+    public MemberRepository(MembersDbContext context, ILogger<MemberRepository> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
@@ -21,6 +28,18 @@ public sealed class MemberRepository : IMemberRepository
     {
         _context.Set<Member>().Add(member);
         return Task.CompletedTask;
+    }
+
+    public async Task<Member?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var member = await _context.Set<Member>().FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+
+        if (member is not null)
+        {
+            LogSensitiveDataAccess(_logger, id, null);
+        }
+
+        return member;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -37,6 +37,8 @@ export default function PersonalInfoStep({ initial, onNext }: Props) {
       religion: "",
       highestEducationalAttainment: "",
       numberOfDependents: 0,
+      email: "",
+      contactNumber: "",
       ...initial,
     },
   });
@@ -147,6 +149,22 @@ export default function PersonalInfoStep({ initial, onNext }: Props) {
           <div>
             <label className="block text-sm font-medium">Number of Dependents</label>
             <input type="number" {...register("numberOfDependents", { valueAsNumber: true })} className="w-full border rounded p-2" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset className="border rounded p-4">
+        <legend className="font-semibold px-2">Contact Information</legend>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium">Email Address *</label>
+            <input type="email" {...register("email")} className="w-full border rounded p-2" inputMode="email" />
+            {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Contact Number *</label>
+            <input type="tel" {...register("contactNumber")} className="w-full border rounded p-2" inputMode="tel" />
+            {errors.contactNumber && <p className="text-red-500 text-xs">{errors.contactNumber.message}</p>}
           </div>
         </div>
       </fieldset>

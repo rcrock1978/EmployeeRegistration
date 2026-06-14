@@ -1,9 +1,11 @@
+using System.Security.Cryptography;
 using System.Text;
 using FluentValidation;
 using Members.Application.Common;
 using Members.Application.Common.Behaviors;
 using Members.Application.Common.Messaging;
 using Members.Infrastructure.Persistence;
+using Members.Infrastructure.Security;
 using Members.WebApi.Endpoints;
 using Members.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +26,17 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<Members.Domain.Members.IMemberRepository, Members.Infrastructure.Persistence.MemberRepository>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+var encryptionOptions = builder.Configuration
+    .GetSection(EncryptionOptions.SectionName)
+    .Get<EncryptionOptions>() ?? new EncryptionOptions();
+
+var encryptionKey = string.IsNullOrEmpty(encryptionOptions.Base64EncodedKey)
+    ? SHA256.HashData(Encoding.UTF8.GetBytes(encryptionOptions.DevPassphrase))
+    : Convert.FromBase64String(encryptionOptions.Base64EncodedKey);
+
+builder.Services.AddSingleton<IEncryptionService>(
+    _ => new AesGcmEncryptionService(encryptionKey));
 
 builder.Services.AddDbContext<MembersDbContext>((sp, options) =>
     options.UseNpgsql(
