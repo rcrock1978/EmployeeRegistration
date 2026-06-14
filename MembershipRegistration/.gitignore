@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+packages/
+*.nupkg
+
+# Node.js / Frontend
+frontend/node_modules/
+frontend/dist/
+*.log
+
+# IDE
+.idea/
+.vs/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Secrets
+*.env
+*.env.local
+*.env.*.local
