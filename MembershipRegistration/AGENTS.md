@@ -52,11 +52,15 @@ For the latest implementation plan and feature context, read `specs/001-member-r
 
 ## Key Decisions
 - Duplicate detection: email address uniqueness only (TIN/company ID not detected in v1)
-- Optimistic concurrency on PUT: EF Core RowVersion → 409 Conflict on mismatch
+- Optimistic concurrency on PUT: PostgreSQL `xmin` → 409 Conflict on mismatch
 - Admin create: same POST endpoint, gated by HRAdmin role (not enforced on POST)
 - Member status transitions: HR/Admin via PUT /api/members/{id}
-- CQRS mediator: custom lightweight instead of MediatR (avoids commercial licensing)
-- Sensitive field encryption: AES-256-GCM, value converters at ModelBuilder level
+- CQRS mediator: custom lightweight ISender/Sender + non-generic IPipelineBehavior (no MediatR licensing)
+- Sender uses reflection (`MakeGenericType`) to resolve concrete command/query handlers from DI
+- Sensitive field encryption: AES-256-GCM via value converters at ModelBuilder level; encrypted TIN/SSS columns use `varchar(200)` to hold base64 ciphertext
+- DateTimeUtcConverter ensures JSON dates are UTC for PostgreSQL `timestamp with time zone`
+- Native ILogger → Serilog migration; `LogTrace` maps to Serilog Verbose
+- HTTPS redirection disabled in Development to support Docker HTTP exposure
 - Dev tokens: symmetric key HMAC-SHA256, used by DevTokenHelper for integration tests
 - Connection string in `appsettings.Development.json` (`postgres/postgres`) — local dev only
 
