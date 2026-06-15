@@ -52,7 +52,7 @@ A flat digital rendering of this form would have a high abandonment rate. This d
 
 **In scope:** registration wizard UI, member create/read/list/update API, validation, persistence (PostgreSQL + EF Core 10), auditing, error handling, health checks, OpenAPI/Scalar docs, observability, security baseline for PII.
 
-**Out of scope:** items in §2.2; SSO identity-provider provisioning beyond consuming standard OIDC; reporting/analytics dashboards; native mobile apps (responsive web only).
+**Out of scope:** items in §2.2; SSO identity-provider provisioning beyond consuming standard OIDC; reporting/analytics dashboards; native mobile apps (responsive web only); automated admin-user provisioning (admin credentials are managed out-of-band).
 
 ## 4. Stakeholders & personas
 
@@ -126,6 +126,48 @@ The single dense form is decomposed into a **5-step wizard**, single-column, mob
 **FR-AC3** — A Member user MUST be able to view only his/her own member detail page and MUST NOT be able to access the member list or another member's detail page.
 **FR-AC4** — Attempts by a Member to access the list page or another member's detail page MUST be rejected with a `403 Forbidden` response (or equivalent access-denied handling).
 **FR-AC5** — Role assignment and authentication are assumed to be provided by the hosting identity mechanism (e.g., OIDC/SSO or corporate identity provider); the system consumes the resolved role and identity claims.
+
+### 6.6 Landing page & navigation
+
+**FR-L1** — A landing page is served at the application root (`/`) with two primary calls to action: "Register as Member" navigates to the registration wizard; "Admin Login" navigates to the admin login page.
+
+**FR-L2** — The landing page displays the OPTODEV branding and a brief description of the registration portal.
+
+**FR-L3** — The app header includes a home link (back to landing page) and, when authenticated as an admin, a logout button.
+
+### 6.7 Admin authentication
+
+**FR-AU1** — An admin login page at `/admin/login` presents a form with email/username and password fields.
+
+**FR-AU2** — A `POST /api/auth/login` endpoint validates credentials and returns a signed JWT containing the user's role claim (`Admin` or `HRAdmin`).
+
+**FR-AU3** — The frontend stores the JWT in `localStorage` and attaches it as a `Bearer` token to all authenticated API requests.
+
+**FR-AU4** — A logout action clears the stored token and redirects to the landing page.
+
+**FR-AU5** — Expired or invalid tokens cause a `401 Unauthorized` response, which the frontend handles by clearing the token and redirecting to the login page.
+
+**FR-AU6** — Unauthenticated access to any admin route (`/admin/*`) redirects to the login page.
+
+### 6.8 Admin member list & detail
+
+**FR-AD1** — An admin member list page at `/admin/members` displays a paginated table of all member records, accessed via `GET /api/members`.
+
+**FR-AD2** — The table shows columns: Name, Email, Status, Employee Level, Created Date.
+
+**FR-AD3** — A filter/search bar allows filtering by last name, email, employee level, and created date range (matching the backend query parameters).
+
+**FR-AD4** — Pagination controls (previous/next, page numbers, page size selector) are displayed below the table.
+
+**FR-AD5** — Clicking a member row navigates to the member detail page at `/admin/members/{id}`.
+
+**FR-AD6** — The member detail page displays all member information read-only, fetched via `GET /api/members/{id}`.
+
+**FR-AD7** — The detail page includes a "Back to list" link.
+
+**FR-AD8** — Loading, empty (no members found), and error states are rendered distinctly on both list and detail pages.
+
+**FR-AD9** — Two admin roles are distinguished: **Admin** (superuser — full CRUD on members, can change admin user roles) and **HRAdmin** (read-only — list members and view detail only).
 
 ---
 
@@ -294,9 +336,16 @@ RESTful, JSON, built with **Minimal APIs** grouped by feature. Every response us
 
 ### 9.1 Endpoints
 
-| Method | Route | Purpose | Success |
-|---|---|---|---|
-| `POST` | `/api/members` | Register a member | `201 Created` + `Location` |
+| Method | Route | Auth | Purpose | Success |
+|---|---|---|---|---|---|
+| `POST` | `/api/auth/login` | AllowAnonymous | Authenticate admin and return JWT | `200 OK` + token |
+| `POST` | `/api/members` | AllowAnonymous | Register a member | `201 Created` + `Location` |
+| `GET` | `/api/members/{id}` | RequireAuthorization | Get member by id | `200 OK` |
+| `GET` | `/api/members` | HRAdminOnly | List/search (paged) | `200 OK` |
+| `PUT` | `/api/members/{id}` | HRAdminOnly | Update member | `200 OK` |
+| `DELETE` | `/api/members/{id}` | — | Deactivate (soft) — *v1.1* | `204 No Content` |
+| `GET` | `/health/live` | AllowAnonymous | Liveness probe | `200 OK` |
+| `GET` | `/health/ready` | AllowAnonymous | Readiness (DB) probe | `200 OK` |
 | `GET` | `/api/members/{id}` | Get member by id | `200 OK` |
 | `GET` | `/api/members` | List/search (paged) | `200 OK` |
 | `PUT` | `/api/members/{id}` | Update member | `200 OK` |
@@ -346,10 +395,12 @@ Query params for list: `?page=1&pageSize=20&lastName=&email=&employeeLevel=&crea
 
 | Code | When |
 |---|---|
-| `200 OK` | Successful read/update |
+| `200 OK` | Successful read/update, login |
 | `201 Created` | Member registered |
 | `204 No Content` | Soft-delete |
-| `400 Bad Request` | Validation failure (`Validation.Failed`) |
+| `400 Bad Request` | Validation failure (`Validation.Failed`) or invalid login credentials |
+| `401 Unauthorized` | Missing, expired, or invalid JWT token |
+| `403 Forbidden` | Authenticated but insufficient role |
 | `404 Not Found` | Unknown member id |
 | `409 Conflict` | Duplicate (e.g., email/TIN already registered) |
 | `422 Unprocessable Entity` | Well-formed but domain-rule violation (if distinguished from 400) |
@@ -619,7 +670,8 @@ React SPA with **React Hook Form** (state), **Zod** (schema/validation via `zodR
 | **P2 — Read & manage** | `GetMemberById`, `ListMembers` (paged/filtered), `UpdateMember`. | Admin read/search/update flows pass integration tests. |
 | **P3 — Frontend wizard** | React + RHF + Zod + Tailwind 5-step wizard; same-as-address toggle; masking; async submit + error mapping. | UX acceptance criteria (E1–E2) pass; WCAG 2.1 AA checks pass. |
 | **P4 — Privacy & hardening** | Field-level encryption for sensitive PII, consent capture, RBAC, rate limiting, retention policy, access logging. | Security/privacy NFRs (§11.3–11.4) met; DPO sign-off. |
-| **P5 (candidate)** | SSO accelerator, ID-image upload, approval workflow, soft-delete/erasure. | Per separate scope. |
+| **P5 — Admin UI & Authentication** | Landing page, login page, JWT token issuance (`POST /api/auth/login`), admin user store, member list page with pagination/filtering, member detail page, route guards, role distinction (Admin vs HRAdmin). | Admin can log in, view paginated member list, and open member detail. |
+| **P6 (candidate)** | SSO accelerator, ID-image upload, approval workflow, soft-delete/erasure. | Per separate scope. |
 
 ---
 

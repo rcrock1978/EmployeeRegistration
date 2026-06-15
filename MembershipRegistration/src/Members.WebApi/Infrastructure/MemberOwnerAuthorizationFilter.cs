@@ -22,7 +22,7 @@ public sealed class MemberOwnerAuthorizationFilter
 
     public async Task<bool> IsOwnerOrAdminAsync(Guid memberId, CancellationToken cancellationToken = default)
     {
-        if (_currentUser.IsInRole("HRAdmin"))
+        if (_currentUser.IsInRole("HRAdmin") || _currentUser.IsInRole("Admin"))
             return true;
 
         var sub = _currentUser.UserId;

@@ -111,7 +111,7 @@ public static class MembersEndpoints
                 error = (object?)null
             });
         })
-        .RequireAuthorization("HRAdminOnly")
+        .RequireAuthorization("AdminOrHRAdmin")
         .WithName("ListMembers");
 
         app.MapPut("/api/members/{id:guid}", async (
@@ -186,7 +186,7 @@ public static class MembersEndpoints
                 error = result.Error
             });
         })
-        .RequireAuthorization("HRAdminOnly")
+        .RequireAuthorization("AdminOnly")
         .WithName("UpdateMember");
     }
 }

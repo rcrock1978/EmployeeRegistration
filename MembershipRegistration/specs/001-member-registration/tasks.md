@@ -268,6 +268,47 @@ description: "Task list for 001-member-registration feature implementation"
 
 ---
 
+## Phase 10: Admin UI (Frontend)
+
+**Purpose**: Landing page, login page, admin member list with pagination, and member detail page.
+
+- [ ] T101 Add `react-router-dom` dependency to `frontend/package.json`
+- [ ] T102 [P] Create route configuration in `frontend/src/App.tsx` — `/` (landing), `/register` (wizard), `/admin/login`, `/admin/members`, `/admin/members/:id`
+- [ ] T103 [P] Create `LandingPage.tsx` component — branding, "Register as Member" and "Admin Login" CTAs
+- [ ] T104 [P] Create `LoginPage.tsx` component — email/username + password form, login button, error message display
+- [ ] T105 [P] Create `useAuth` hook in `frontend/src/hooks/useAuth.ts` — login function, token storage (localStorage), logout, `isAuthenticated`, `userRole`
+- [ ] T106 [P] Create `AuthContext` React context — provides auth state to all child components
+- [ ] T107 [P] Create `ProtectedRoute` component — redirects to login if not authenticated, checks role requirement
+- [ ] T108 [P] Create `api.ts` update — add `login()` function, add `fetchWithAuth()` wrapper that attaches Bearer token, handles 401 redirects
+- [ ] T109 [P] Create `AdminMemberList.tsx` component — paginated table with columns (Name, Email, Status, Employee Level, Created Date), filter bar (lastName, email, employeeLevel, date range), pagination controls
+- [ ] T110 [P] Create `AdminMemberDetail.tsx` component — read-only display of all member fields, fetched via `GET /api/members/{id}`
+- [ ] T111 [P] Create `LogoutButton` component — clears token, redirects to landing page
+- [ ] T112 Update app header in `App.tsx` — conditionally show logout button when authenticated
+- [ ] T113 [P] Write component tests for `LoginPage`, `AdminMemberList`, `AdminMemberDetail`, `LandingPage`
+
+---
+
+## Phase 11: Auth Backend
+
+**Purpose**: Login endpoint, admin user store, admin seeding for development.
+
+- [ ] T114 Create `AdminUser` entity and `AdminUserConfiguration` in `Members.Infrastructure/Persistence/` — Id (GUID), Email, PasswordHash, Role (Admin/HRAdmin), CreatedOn
+- [ ] T115 Create `AdminUser` table migration
+- [ ] T116 Create `AdminUserRepository` in `Members.Infrastructure/Persistence/Repositories/`
+- [ ] T117 [P] Create `LoginRequest` DTO and `LoginResponse` DTO in `Members.Application/Features/Auth/`
+- [ ] T118 [P] Create `LoginCommand` and `LoginCommandHandler` — validates credentials, generates JWT
+- [ ] T119 [P] Create `JwtTokenService` in `Members.Infrastructure/Security/` — generates JWTs with proper claims (sub, role, email)
+- [ ] T120 [P] Create `POST /api/auth/login` endpoint in new `AuthEndpoints.cs` — returns signed JWT on valid credentials, 401 on invalid
+- [ ] T121 [P] Update `Program.cs` — register auth services, admin endpoints, seed dev admin user
+- [ ] T122 [P] Admin seed data — create default dev admin accounts (e.g., admin@optodev.com / HRAdmin@optodev.com) in development
+- [ ] T123 [P] Write integration tests for login endpoint — valid credentials return 200 + token, invalid return 401
+- [ ] T124 Write integration tests for admin list/detail endpoints with HRAdmin role token (read-only) vs Admin role token (full access + role management)
+- [ ] T125 Create `POST /api/auth/admin-users/{id}/role` endpoint — Admin-only, changes a user's role
+- [ ] T125 Update `docker-compose.yml` — ensure frontend Nginx proxies `/api/auth/` to the API service (already proxied via `/api/` catch-all)
+- [ ] T126 Update frontend `Dockerfile` — rebuild with new dependencies
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -281,6 +322,8 @@ description: "Task list for 001-member-registration feature implementation"
 - **US5 (Phase 7)**: Depends on US4 endpoints + authorization infrastructure
 - **US6 (Phase 8)**: Depends on Foundational (health probes exist in Phase 2, this phase adds polish)
 - **Polish (Phase 9)**: Depends on all desired user stories complete
+- **Admin UI (Phase 10)**: Depends on Foundational — frontend-only can be built independently; final integration requires Phase 11 auth backend
+- **Auth Backend (Phase 11)**: Depends on Foundational — independent of member feature slices
 
 ### User Story Dependencies
 

@@ -6,10 +6,11 @@ For the latest implementation plan and feature context, read `specs/001-member-r
 
 ## Repo state
 
-- **All implementation phases complete (P0–P4).** Full-stack member registration platform: .NET 10 REST API + React SPA wizard.
-- Build: 0 errors, 2 warnings (MSB3277 pre-release EF Core version conflict, non-blocking).
-- Architecture tests: 6/6 passing (inward-only Clean Architecture dependency enforcement).
-- Integration tests: 5/5 passing (Docker + Testcontainers PostgreSQL available on this machine).
+- **P0–P4 complete.** Full-stack member registration platform: .NET 10 REST API + React SPA wizard.
+- **P5 (Admin UI & Auth):** Requirements defined — not yet implemented. See `specs/001-member-registration/plan.md` §P5 and `tasks.md` Phase 10-11.
+- Build: 0 errors, 0 warnings.
+- Architecture tests: 6/6 passing.
+- Integration tests: 5/5 passing (Docker + Testcontainers PostgreSQL).
 - Frontend: 0 errors, 7/7 component tests passing, 317 KB JS production bundle (93 KB gzipped).
 - CI pipeline: GitHub Actions runs backend build/test, architecture tests, frontend lint/type-check/test/build.
 
@@ -53,8 +54,9 @@ For the latest implementation plan and feature context, read `specs/001-member-r
 ## Key Decisions
 - Duplicate detection: email address uniqueness only (TIN/company ID not detected in v1)
 - Optimistic concurrency on PUT: PostgreSQL `xmin` → 409 Conflict on mismatch
-- Admin create: same POST endpoint, gated by HRAdmin role (not enforced on POST)
-- Member status transitions: HR/Admin via PUT /api/members/{id}
+- Admin create: same POST endpoint, gated by Admin role (not enforced on POST)
+- Member status transitions: Admin via PUT /api/members/{id}
+- Roles: **Admin** (superuser — CRUD members, manage admin roles), **HRAdmin** (read-only — list + detail)
 - CQRS mediator: custom lightweight ISender/Sender + non-generic IPipelineBehavior (no MediatR licensing)
 - Sender uses reflection (`MakeGenericType`) to resolve concrete command/query handlers from DI
 - Sensitive field encryption: AES-256-GCM via value converters at ModelBuilder level; encrypted TIN/SSS columns use `varchar(200)` to hold base64 ciphertext
@@ -104,6 +106,7 @@ For the latest implementation plan and feature context, read `specs/001-member-r
 
 ## Remaining / Blocked
 - (none) — all P0–P4 implementation tasks and Phase 9 quality gates are complete.
+- **P5 (Admin UI & Auth):** Requirements defined in PRD §§6.6–6.8 and spec.md — not yet implemented. See `specs/001-member-registration/plan.md` §P5 and tasks.md Phase 10-11.
 
 ## Completed Quality Gates
 - Integration tests: 5/5 green against Testcontainers PostgreSQL

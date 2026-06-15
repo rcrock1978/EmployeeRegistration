@@ -221,3 +221,54 @@ The registration wizard is organized into five steps, presented in this order:
 - The 99.9% availability target, scalability thresholds, and responsive breakpoints are inherited from the hosting platform and front-end implementation choices rather than being v1 deliverable requirements.
 - Duplicate TIN or company ID detection is not implemented in v1; only email uniqueness is enforced.
 - Network connectivity loss during submission and JWT expiry during a long wizard session are handled by native browser behavior and standard 401 responses, respectively; dedicated retry/refresh flows are out of scope for v1.
+
+---
+
+## Admin UI Requirements
+
+### User Story 7 — Landing page with navigation choices (Priority: P5)
+
+A visitor can land on the application and choose to either register as a new member or log in as an admin.
+
+**Acceptance Scenarios**:
+1. **Given** a visitor navigates to the application root (`/`), **When** the page loads, **Then** they see OPTODEV branding and two CTAs: "Register as Member" and "Admin Login".
+2. **Given** a visitor clicks "Register as Member", **When** the navigation occurs, **Then** they are taken to the registration wizard.
+3. **Given** a visitor clicks "Admin Login", **When** the navigation occurs, **Then** they are taken to `/admin/login`.
+
+### User Story 8 — Admin login (Priority: P5)
+
+An admin user can authenticate to access admin features.
+
+**Acceptance Scenarios**:
+1. **Given** an admin enters valid credentials on `/admin/login`, **When** they click Login, **Then** a JWT is issued and stored, and they are redirected to `/admin/members`.
+2. **Given** an admin enters invalid credentials, **When** they click Login, **Then** an error message is displayed and no token is issued.
+3. **Given** an unauthenticated user navigates to any `/admin/*` route, **When** the route resolves, **Then** they are redirected to `/admin/login`.
+
+### User Story 9 — Browse paginated member list (Priority: P5)
+
+An authenticated admin can view a paginated, filterable list of all members.
+
+**Acceptance Scenarios**:
+1. **Given** an authenticated admin navigates to `/admin/members`, **When** the page loads, **Then** a table of members is displayed with columns: Name, Email, Status, Employee Level, Created Date.
+2. **Given** there are multiple pages, **When** the user clicks a page number or Next/Previous, **Then** the corresponding page loads.
+3. **Given** the user enters filter values (lastName, email, employeeLevel, date range), **When** the filter is applied, **Then** the list updates to show matching results.
+4. **Given** no members match the filters, **When** the list renders, **Then** an empty-state message is shown.
+5. **Given** the list is loading, **When** the data is being fetched, **Then** a loading indicator is shown.
+
+### User Story 10 — View member detail (Priority: P5)
+
+An authenticated admin can view a single member's complete information.
+
+**Acceptance Scenarios**:
+1. **Given** an authenticated admin clicks a member row in the list, **When** the detail page loads, **Then** all member fields are displayed read-only.
+2. **Given** the admin is on the detail page, **When** they click "Back to list", **Then** they return to the member list.
+3. **Given** the member ID does not exist, **When** the detail page loads, **Then** a "not found" message is displayed.
+
+### Admin UI Functional Requirements
+
+- **FR-AU1**: A `POST /api/auth/login` endpoint validates admin credentials and returns a JWT.
+- **FR-AU2**: The JWT contains `sub` (user email), `role` (`Admin` or `HRAdmin`), and `email` claims.
+- **FR-AU3**: The frontend stores the JWT in `localStorage` and sends it as a `Bearer` token.
+- **FR-AU4**: Expired or invalid tokens trigger a 401 response; the frontend clears the token and redirects to login.
+- **FR-AU5**: Two admin roles exist: **Admin** (superuser — list, detail, update members, manage admin user roles) and **HRAdmin** (read-only — list and detail, no update).
+- **FR-AU6**: The landing page is served at `/`; the wizard at `/register`; login at `/admin/login`; member list at `/admin/members`; member detail at `/admin/members/{id}`.

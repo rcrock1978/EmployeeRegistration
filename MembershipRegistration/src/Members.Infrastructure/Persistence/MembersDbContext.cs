@@ -1,4 +1,6 @@
 using Members.Application.Common;
+using Members.Domain.AdminUsers;
+using Members.Domain.Members;
 using Microsoft.EntityFrameworkCore;
 using Members.Infrastructure.Security;
 
@@ -13,6 +15,9 @@ public class MembersDbContext : DbContext
     {
         _encryptionService = encryptionService;
     }
+
+    public DbSet<Member> Members => Set<Member>();
+    public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

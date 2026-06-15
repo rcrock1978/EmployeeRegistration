@@ -6,7 +6,7 @@
 
 ## Summary
 
-Build the OPTODEV Member Registration platform: a responsive React single-page wizard that captures member/employee information, backed by a .NET 10 REST API using Clean Architecture + Vertical Slice + CQRS, persisted in PostgreSQL, with role-based access control, audit logging, health probes, and interactive OpenAPI documentation. The work is delivered in phases: foundation (P0), compliant registration (P1), admin read/manage + frontend wizard (P2), member self-view (P3), and operability/polish (P4).
+Build the OPTODEV Member Registration platform: a responsive React single-page wizard that captures member/employee information, backed by a .NET 10 REST API using Clean Architecture + Vertical Slice + CQRS, persisted in PostgreSQL, with role-based access control, audit logging, health probes, and interactive OpenAPI documentation. The work is delivered in phases: foundation (P0), compliant registration (P1), admin read/manage + frontend wizard (P2), member self-view (P3), operability/polish (P4), and admin UI + auth (P5).
 
 ## Technical Context
 
@@ -58,12 +58,13 @@ Build the OPTODEV Member Registration platform: a responsive React single-page w
 ## Phase Mapping
 
 | Plan Phase | Tasks.md Phase(s) | Scope |
-|---|---|---|
+|---|---|---|---|
 | P0 — Foundation | Phase 1 (Setup) + Phase 2 (Foundational) | Solution skeleton, DI, DbContext, health probes, Scalar, CI, architecture tests |
 | P1 — Compliant Registration | Phase 3 (US1) + Phase 5 (US3) | Register member end-to-end, encryption, consent, PII redaction, access logging |
 | P2 — Admin Read/Manage + Frontend | Phase 6 (US4) + Phase 4 (US2) | Get/list/update endpoints, React wizard, address toggle, validation, async submit |
 | P3 — Member Self-View | Phase 7 (US5) | RBAC enforcement on read endpoints |
 | P4 — Operability + Polish | Phase 8 (US6) + Phase 9 (Polish) | Correlation ID, structured logging, final quality gates |
+| P5 — Admin UI & Auth | Phase 10 (Admin UI) + Phase 11 (Auth Backend) | Landing page, login, JWT issuance, admin user store, member list/detail UI, route guards |
 
 ## Constitution Check
 
@@ -129,13 +130,16 @@ tests/
 
 frontend/
 ├── src/
-│   ├── components/
-│   ├── features/
-│   │   └── registration/
-│   ├── hooks/
-│   ├── schemas/
-│   └── services/
-└── tests/
+│   ├── components/              # Wizard steps, step indicator, landing, login, admin pages
+│   │   ├── steps/               # PersonalInfo, Family, GovernmentIds, Residency, EmploymentConsent
+│   │   ├── LandingPage.tsx
+│   │   ├── LoginPage.tsx
+│   │   ├── AdminMemberList.tsx
+│   │   └── AdminMemberDetail.tsx
+│   ├── hooks/                   # useRegistration, useAuth
+│   ├── lib/                     # schemas, api client
+│   └── types/                   # API type definitions
+├── tests/
 ```
 
 **Structure Decision**: Four-project backend solution satisfies Clean Architecture inward-only dependency rule; `frontend/` is a separate Vite React SPA. Each backend feature is a vertical slice containing command/query, handler, validator, response DTO, and endpoint.

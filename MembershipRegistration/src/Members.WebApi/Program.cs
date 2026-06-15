@@ -47,6 +47,15 @@ builder.Services.AddScoped<Members.Domain.Members.IMemberRepository, Members.Inf
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<MemberOwnerAuthorizationFilter>();
 builder.Services.AddScoped<IMemberSubmissionLogger, Members.Infrastructure.Logging.MemberSubmissionLogger>();
+builder.Services.AddScoped<IAdminUserRepository, Members.Infrastructure.Persistence.AdminUserRepository>();
+builder.Services.AddScoped<IPasswordHasher, Members.Infrastructure.Security.PasswordHasher>();
+
+var authOptions = builder.Configuration
+    .GetSection(AuthOptions.SectionName)
+    .Get<AuthOptions>() ?? new AuthOptions();
+
+builder.Services.AddSingleton<IJwtTokenService>(
+    _ => new Members.Infrastructure.Security.JwtTokenService(authOptions.DevelopmentSigningKey));
 
 var encryptionOptions = builder.Configuration
     .GetSection(EncryptionOptions.SectionName)
@@ -63,10 +72,6 @@ builder.Services.AddDbContext<MembersDbContext>((sp, options) =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"))
         .AddInterceptors(sp.GetRequiredService<AuditInterceptor>()));
-
-var authOptions = builder.Configuration
-    .GetSection(AuthOptions.SectionName)
-    .Get<AuthOptions>() ?? new AuthOptions();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -98,9 +103,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("HRAdminOnly", policy =>
-        policy.RequireRole("HRAdmin"));
-    options.AddPolicy("MemberOrHRAdmin", policy =>
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+    options.AddPolicy("AdminOrHRAdmin", policy =>
+        policy.RequireAssertion(ctx =>
+            ctx.User.IsInRole("Admin") || ctx.User.IsInRole("HRAdmin")));
+    options.AddPolicy("MemberOrAdmin", policy =>
         policy.RequireAuthenticatedUser());
 });
 
@@ -146,6 +154,7 @@ app.UseAuthorization();
 
 app.MapHealthEndpoints();
 app.MapMembersEndpoints();
+app.MapAuthEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
@@ -153,6 +162,8 @@ if (app.Environment.IsDevelopment())
     var db = scope.ServiceProvider.GetRequiredService<MembersDbContext>();
     await db.Database.MigrateAsync();
     await DataSeeder.SeedAsync(db);
+    await DataSeeder.SeedAdminUsersAsync(db,
+        scope.ServiceProvider.GetRequiredService<IPasswordHasher>());
 }
 
 app.Run();

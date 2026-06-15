@@ -4,8 +4,8 @@
 
 A full-stack member registration platform:
 
-- **Backend**: .NET 10 ASP.NET Core Minimal APIs — Clean Architecture + CQRS + PostgreSQL
-- **Frontend**: React 19 SPA — 5-step wizard, Zod validation, Tailwind CSS v4, dark mode
+- **Backend**: .NET 10 ASP.NET Core Minimal APIs — Clean Architecture + CQRS + PostgreSQL, JWT auth (Admin/HRAdmin roles)
+- **Frontend**: React 19 SPA — landing page, 5-step registration wizard, admin login, admin member list, member detail
 - **Infrastructure**: Docker Compose (PostgreSQL + API + Frontend), Serilog logging, GitHub Actions CI
 
 ---
@@ -29,18 +29,22 @@ This is the fastest way to get everything running — database, API, and fronten
 docker compose up --build
 ```
 
-Then open **http://localhost:3000** for the registration wizard.
+Then open **http://localhost:3000** for the landing page.
 
 | Service | URL |
-|---------|-----|
-| Frontend (SPA) | http://localhost:3000 |
-| API | http://localhost:5000 |
-| Scalar API docs | http://localhost:5000/scalar/v1 |
+|---------|------|
+| Frontend (Landing) | http://localhost:3000 |
+| Registration Wizard | http://localhost:3000/register |
+| Admin Login | http://localhost:3000/admin/login |
+| Admin Member List | http://localhost:3000/admin/members |
+| API | http://localhost:5001 |
+| Scalar API docs | http://localhost:5001/scalar/v1 |
 | Database | `localhost:5432` (postgres/postgres) |
 
 On first startup, the API automatically:
 1. Applies pending EF Core migrations
 2. Seeds **1000 random member records** with realistic Filipino data
+3. Seeds **2 admin accounts** (see credentials below)
 
 > Logs are written to `logs/` in the project root (daily rolling file + per-member JSON).
 
@@ -65,7 +69,7 @@ docker run -d --name optodev-pg \
 dotnet run --project src/Members.WebApi
 ```
 
-The API starts on **http://localhost:5000** and auto-migrates + seeds 1000 records on startup.
+The API starts on **http://localhost:5001** and auto-migrates + seeds 1000 records on startup.
 
 ### 3. Run the frontend
 
@@ -75,7 +79,7 @@ npm install
 npm run dev
 ```
 
-Opens at **http://localhost:5173**. The Vite dev server proxies API calls to `http://localhost:5000`.
+Opens at **http://localhost:5173** (landing page). The Vite dev server proxies API calls to `http://localhost:5001`.
 
 ---
 
@@ -107,11 +111,22 @@ Available roles:
 
 | Role | Access |
 |------|--------|
-| `HRAdmin` | List all members, view any detail, update records |
+| `Admin` | List all members, view any detail, update records, manage admin user roles (superuser) |
+| `HRAdmin` | List all members, view any detail (read-only, no update) |
 | `Member` | View own record only (403 for list / other records) |
 
-Without a token: all endpoints except `POST /api/members` return 401.
+Without a token: all endpoints except `POST /api/members` and `POST /api/auth/login` return 401.
 `POST /api/members` is anonymous (anyone can register).
+`POST /api/auth/login` is anonymous (admin login).
+
+### Dev admin credentials
+
+In development mode, the following admin accounts are seeded:
+
+| Email | Password | Role |
+|-------|----------|------|
+| `admin@optodev.com` | `Admin123!` | Admin (superuser — full access + role management) |
+| `hradmin@optodev.com` | `HRAdmin123!` | HRAdmin (read-only) |
 
 ---
 
@@ -121,10 +136,11 @@ Without a token: all endpoints except `POST /api/members` return 401.
 
 | Method | Route | Auth | Purpose |
 |--------|-------|------|---------|
+| `POST` | `/api/auth/login` | None | Admin login, returns JWT |
 | `POST` | `/api/members` | None | Register a new member |
-| `GET` | `/api/members/{id}` | Required | View member (admin=any, member=own) |
-| `GET` | `/api/members` | HRAdmin | List members (paged, filterable) |
-| `PUT` | `/api/members/{id}` | HRAdmin | Update a member record |
+| `GET` | `/api/members/{id}` | Required | View member (admin or HRAdmin=any, member=own) |
+| `GET` | `/api/members` | AdminOrHRAdmin | List members (paged, filterable) |
+| `PUT` | `/api/members/{id}` | AdminOnly | Update a member record |
 | `GET` | `/health/live` | None | Liveness probe |
 | `GET` | `/health/ready` | None | Readiness probe (DB check) |
 
@@ -132,11 +148,16 @@ Without a token: all endpoints except `POST /api/members` return 401.
 
 ```bash
 # Health
-curl http://localhost:5000/health/live
-curl http://localhost:5000/health/ready
+curl http://localhost:5001/health/live
+curl http://localhost:5001/health/ready
+
+# Admin login
+curl -X POST http://localhost:5001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@optodev.com", "password": "Admin123!"}'
 
 # Register a member (anonymous)
-curl -X POST http://localhost:5000/api/members \
+curl -X POST http://localhost:5001/api/members \
   -H "Content-Type: application/json" \
   -d '{
     "personalInfo": {
@@ -180,8 +201,12 @@ curl -X POST http://localhost:5000/api/members \
     }
   }'
 
-# List members (with HRAdmin token)
-curl http://localhost:5000/api/members?page=1&pageSize=10 \
+# List members (requires Admin or HRAdmin token)
+curl http://localhost:5001/api/members?page=1&pageSize=10 \
+  -H "Authorization: Bearer <token>"
+
+# Get member by ID (requires Admin or HRAdmin token)
+curl http://localhost:5001/api/members/a2b8a3e6-... \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -215,16 +240,21 @@ cd frontend && npx tsc --noEmit
 
 ```
 ├── src/
-│   ├── Members.Domain/        # Entities, value objects, enums
-│   ├── Members.Application/   # CQRS commands/queries, validators, behaviors
-│   ├── Members.Infrastructure/ # EF Core, encryption, logging, repositories
+│   ├── Members.Domain/        # Entities, value objects, enums (Member, AdminUser)
+│   ├── Members.Application/   # CQRS commands/queries, validators, behaviors (Register, List, Auth)
+│   ├── Members.Infrastructure/ # EF Core, encryption, JWT, logging, repositories
 │   └── Members.WebApi/        # Minimal API endpoints, auth, middleware
 ├── tests/
 │   ├── Members.Domain.UnitTests/      # 35 tests (architecture + value objects)
 │   ├── Members.Application.UnitTests/ # 20 tests (validators)
 │   └── Members.Api.IntegrationTests/  # 5 tests (HTTP → Postgres)
 ├── frontend/
-│   ├── src/                   # React SPA (wizard, hooks, schemas, services)
+│   ├── src/
+│   │   ├── components/        # Landing, Login, Wizard, MemberList, MemberDetail
+│   │   ├── contexts/          # AuthContext (JWT token, login/logout)
+│   │   ├── hooks/             # useRegistration, useAuth
+│   │   ├── lib/               # API client, schemas
+│   │   └── types/             # TypeScript API types
 │   └── Dockerfile             # Multi-stage Node + Nginx build
 └── docker-compose.yml         # PostgreSQL + API + Frontend
 ```

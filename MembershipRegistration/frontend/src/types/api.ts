@@ -127,3 +127,95 @@ export interface ConsentDto {
   attestation: boolean;
   signatureName: string;
 }
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  email: string;
+  role: string;
+}
+
+export interface MemberListItem {
+  id: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  emailAddress: string;
+  employeeLevel: string;
+  status: string;
+  createdOn: string;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+export interface MemberDetail {
+  id: string;
+  personName: {
+    title: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    suffix?: string;
+    alias?: string;
+  };
+  demographics: {
+    dateOfBirth: string;
+    placeOfBirth: string;
+    countryOfBirth: string;
+    nationality: string;
+    gender: string;
+    civilStatus: string;
+    religion?: string;
+    highestEducationalAttainment: string;
+  };
+  contactDetails: {
+    emailAddress: string;
+    contactNumber: string;
+  };
+  numberOfDependents: number;
+  relatedPersons: {
+    spouse?: { firstName: string; middleName?: string; lastName: string };
+    motherMaidenName?: string;
+    father?: { firstName: string; middleName?: string; lastName: string; suffix?: string };
+  };
+  governmentIds: {
+    tin: string;
+    sss: string;
+  };
+  primaryId: {
+    type: string;
+    number: string;
+    issueDate: string;
+    expiryDate: string;
+    issueCountry: string;
+  };
+  currentAddress: AddressDto;
+  permanentAddress: {
+    sameAsCurrent: boolean;
+    address?: AddressDto;
+  };
+  emergencyContact: {
+    contactName: string;
+    relationship: string;
+    contactNumber: string;
+  };
+  employment: EmploymentDto;
+  consent: {
+    consentGiven: boolean;
+    attestation: boolean;
+    signatureName: string;
+  };
+  status: string;
+  createdOn: string;
+  updatedOn?: string;
+}

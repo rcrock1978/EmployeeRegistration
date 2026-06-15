@@ -1,3 +1,4 @@
+using Members.Domain.AdminUsers;
 using Members.Domain.Members;
 using Microsoft.EntityFrameworkCore;
 
@@ -210,6 +211,21 @@ public static class DataSeeder
 
     private static bool Chance(double probability) =>
         Rng.NextDouble() < probability;
+
+    public static async Task SeedAdminUsersAsync(MembersDbContext context, Application.Common.IPasswordHasher passwordHasher)
+    {
+        if (await context.AdminUsers.AnyAsync())
+            return;
+
+        var admins = new List<AdminUser>
+        {
+            new("admin@optodev.com", passwordHasher.Hash("Admin123!"), "Admin"),
+            new("hradmin@optodev.com", passwordHasher.Hash("HRAdmin123!"), "HRAdmin"),
+        };
+
+        context.AdminUsers.AddRange(admins);
+        await context.SaveChangesAsync();
+    }
 
     private static string GetCivilStatus(int index)
     {
