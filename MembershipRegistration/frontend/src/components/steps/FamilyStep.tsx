@@ -34,18 +34,18 @@ export default function FamilyStep({ initial, civilStatus, onNext, onBack }: Pro
           <legend className="font-semibold px-2">Spouse</legend>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium">First Name *</label>
-              <input {...register("spouse.firstName")} className="w-full border rounded p-2" />
-              {errors.spouse?.firstName && <p className="text-red-500 text-xs">{errors.spouse.firstName.message}</p>}
+              <label htmlFor="spouse.firstName" className="block text-sm font-medium">First Name *</label>
+              <input id="spouse.firstName" {...register("spouse.firstName")} className="w-full border rounded p-2" />
+              {errors.spouse?.firstName && <p className="text-red-700 text-xs">{errors.spouse.firstName.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium">Middle Name</label>
-              <input {...register("spouse.middleName")} className="w-full border rounded p-2" />
+              <label htmlFor="spouse.middleName" className="block text-sm font-medium">Middle Name</label>
+              <input id="spouse.middleName" {...register("spouse.middleName")} className="w-full border rounded p-2" />
             </div>
             <div>
-              <label className="block text-sm font-medium">Last Name *</label>
-              <input {...register("spouse.lastName")} className="w-full border rounded p-2" />
-              {errors.spouse?.lastName && <p className="text-red-500 text-xs">{errors.spouse.lastName.message}</p>}
+              <label htmlFor="spouse.lastName" className="block text-sm font-medium">Last Name *</label>
+              <input id="spouse.lastName" {...register("spouse.lastName")} className="w-full border rounded p-2" />
+              {errors.spouse?.lastName && <p className="text-red-700 text-xs">{errors.spouse.lastName.message}</p>}
             </div>
           </div>
         </fieldset>
@@ -54,8 +54,8 @@ export default function FamilyStep({ initial, civilStatus, onNext, onBack }: Pro
       <fieldset className="border rounded p-4">
         <legend className="font-semibold px-2">Mother</legend>
         <div>
-          <label className="block text-sm font-medium">Mother's Maiden Name</label>
-          <input {...register("motherMaidenName")} className="w-full border rounded p-2" />
+          <label htmlFor="motherMaidenName" className="block text-sm font-medium">Mother's Maiden Name</label>
+          <input id="motherMaidenName" {...register("motherMaidenName")} className="w-full border rounded p-2" />
         </div>
       </fieldset>
 
@@ -63,20 +63,20 @@ export default function FamilyStep({ initial, civilStatus, onNext, onBack }: Pro
         <legend className="font-semibold px-2">Father</legend>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium">First Name</label>
-            <input {...register("father.firstName")} className="w-full border rounded p-2" />
+            <label htmlFor="father.firstName" className="block text-sm font-medium">First Name</label>
+            <input id="father.firstName" {...register("father.firstName")} className="w-full border rounded p-2" />
           </div>
           <div>
-            <label className="block text-sm font-medium">Middle Name</label>
-            <input {...register("father.middleName")} className="w-full border rounded p-2" />
+            <label htmlFor="father.middleName" className="block text-sm font-medium">Middle Name</label>
+            <input id="father.middleName" {...register("father.middleName")} className="w-full border rounded p-2" />
           </div>
           <div>
-            <label className="block text-sm font-medium">Last Name</label>
-            <input {...register("father.lastName")} className="w-full border rounded p-2" />
+            <label htmlFor="father.lastName" className="block text-sm font-medium">Last Name</label>
+            <input id="father.lastName" {...register("father.lastName")} className="w-full border rounded p-2" />
           </div>
           <div>
-            <label className="block text-sm font-medium">Suffix</label>
-            <select {...register("father.suffix")} className="w-full border rounded p-2">
+            <label htmlFor="father.suffix" className="block text-sm font-medium">Suffix</label>
+            <select id="father.suffix" {...register("father.suffix")} className="w-full border rounded p-2">
               <option value="">None</option>
               <option>Jr.</option>
               <option>Sr.</option>

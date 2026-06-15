@@ -73,7 +73,7 @@ export default function ResidencyStep({ initial, onNext, onBack }: Props) {
       field.charAt(0).toUpperCase() + field.slice(1);
     return (
       <div>
-        <label className="block text-sm font-medium">
+        <label htmlFor={id} className="block text-sm font-medium">
           {label} {required && "*"}
         </label>
         <input
@@ -82,7 +82,7 @@ export default function ResidencyStep({ initial, onNext, onBack }: Props) {
           className="w-full border rounded p-2"
         />
         {(errors as any)[registerName] && (
-          <p className="text-red-500 text-xs">{(errors as any)[registerName]?.message}</p>
+          <p className="text-red-700 text-xs">{(errors as any)[registerName]?.message}</p>
         )}
       </div>
     );
@@ -105,8 +105,9 @@ export default function ResidencyStep({ initial, onNext, onBack }: Props) {
         </div>
       </fieldset>
 
-      <label className="flex items-center gap-2 cursor-pointer">
+      <label htmlFor="sameAsCurrent" className="flex items-center gap-2 cursor-pointer">
         <input
+          id="sameAsCurrent"
           type="checkbox"
           checked={sameAsCurrent}
           onChange={(e) => handleToggle(e.target.checked)}

@@ -43,31 +43,31 @@ export default function EmploymentConsentStep({ initial, onSubmit, onBack }: Pro
         <legend className="font-semibold px-2">Employment Details</legend>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium">Employee Level *</label>
-            <select {...register("employeeLevel")} className="w-full border rounded p-2">
+            <label htmlFor="employeeLevel" className="block text-sm font-medium">Employee Level *</label>
+            <select id="employeeLevel" {...register("employeeLevel")} className="w-full border rounded p-2">
               <option value="">Select</option>
               {EMPLOYEE_LEVELS.map((l) => <option key={l}>{l}</option>)}
             </select>
-            {errors.employeeLevel && <p className="text-red-500 text-xs">{errors.employeeLevel.message}</p>}
+            {errors.employeeLevel && <p className="text-red-700 text-xs">{errors.employeeLevel.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Company Trade Name *</label>
-            <input {...register("companyTradeName")} className="w-full border rounded p-2" />
-            {errors.companyTradeName && <p className="text-red-500 text-xs">{errors.companyTradeName.message}</p>}
+            <label htmlFor="companyTradeName" className="block text-sm font-medium">Company Trade Name *</label>
+            <input id="companyTradeName" {...register("companyTradeName")} className="w-full border rounded p-2" />
+            {errors.companyTradeName && <p className="text-red-700 text-xs">{errors.companyTradeName.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Company ID Number *</label>
-            <input {...register("companyIdNumber")} className="w-full border rounded p-2" />
-            {errors.companyIdNumber && <p className="text-red-500 text-xs">{errors.companyIdNumber.message}</p>}
+            <label htmlFor="companyIdNumber" className="block text-sm font-medium">Company ID Number *</label>
+            <input id="companyIdNumber" {...register("companyIdNumber")} className="w-full border rounded p-2" />
+            {errors.companyIdNumber && <p className="text-red-700 text-xs">{errors.companyIdNumber.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Gross Income *</label>
-            <input type="number" {...register("grossIncome", { valueAsNumber: true })} className="w-full border rounded p-2" />
-            {errors.grossIncome && <p className="text-red-500 text-xs">{errors.grossIncome.message}</p>}
+            <label htmlFor="grossIncome" className="block text-sm font-medium">Gross Income *</label>
+            <input id="grossIncome" type="number" {...register("grossIncome", { valueAsNumber: true })} className="w-full border rounded p-2" />
+            {errors.grossIncome && <p className="text-red-700 text-xs">{errors.grossIncome.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Income Period *</label>
-            <select {...register("incomePeriod")} className="w-full border rounded p-2">
+            <label htmlFor="incomePeriod" className="block text-sm font-medium">Income Period *</label>
+            <select id="incomePeriod" {...register("incomePeriod")} className="w-full border rounded p-2">
               <option value="">Select</option>
               <option>Daily</option>
               <option>Weekly</option>
@@ -75,21 +75,21 @@ export default function EmploymentConsentStep({ initial, onSubmit, onBack }: Pro
               <option>Monthly</option>
               <option>Annually</option>
             </select>
-            {errors.incomePeriod && <p className="text-red-500 text-xs">{errors.incomePeriod.message}</p>}
+            {errors.incomePeriod && <p className="text-red-700 text-xs">{errors.incomePeriod.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Occupation *</label>
-            <input {...register("occupation")} className="w-full border rounded p-2" />
-            {errors.occupation && <p className="text-red-500 text-xs">{errors.occupation.message}</p>}
+            <label htmlFor="occupation" className="block text-sm font-medium">Occupation *</label>
+            <input id="occupation" {...register("occupation")} className="w-full border rounded p-2" />
+            {errors.occupation && <p className="text-red-700 text-xs">{errors.occupation.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Hired From *</label>
-            <input type="date" {...register("hiredFrom")} className="w-full border rounded p-2" />
-            {errors.hiredFrom && <p className="text-red-500 text-xs">{errors.hiredFrom.message}</p>}
+            <label htmlFor="hiredFrom" className="block text-sm font-medium">Hired From *</label>
+            <input id="hiredFrom" type="date" {...register("hiredFrom")} className="w-full border rounded p-2" />
+            {errors.hiredFrom && <p className="text-red-700 text-xs">{errors.hiredFrom.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Hired To</label>
-            <input type="date" {...register("hiredTo")} className="w-full border rounded p-2" />
+            <label htmlFor="hiredTo" className="block text-sm font-medium">Hired To</label>
+            <input id="hiredTo" type="date" {...register("hiredTo")} className="w-full border rounded p-2" />
           </div>
         </div>
       </fieldset>
@@ -98,23 +98,24 @@ export default function EmploymentConsentStep({ initial, onSubmit, onBack }: Pro
         <legend className="font-semibold px-2">Emergency Contact</legend>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium">Contact Name *</label>
-            <input {...register("contactName")} className="w-full border rounded p-2" />
-            {errors.contactName && <p className="text-red-500 text-xs">{errors.contactName.message}</p>}
+            <label htmlFor="contactName" className="block text-sm font-medium">Contact Name *</label>
+            <input id="contactName" {...register("contactName")} className="w-full border rounded p-2" />
+            {errors.contactName && <p className="text-red-700 text-xs">{errors.contactName.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Relationship *</label>
-            <input {...register("relationship")} className="w-full border rounded p-2" />
-            {errors.relationship && <p className="text-red-500 text-xs">{errors.relationship.message}</p>}
+            <label htmlFor="relationship" className="block text-sm font-medium">Relationship *</label>
+            <input id="relationship" {...register("relationship")} className="w-full border rounded p-2" />
+            {errors.relationship && <p className="text-red-700 text-xs">{errors.relationship.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium">Contact Number *</label>
+            <label htmlFor="contactNumber" className="block text-sm font-medium">Contact Number *</label>
             <input
+              id="contactNumber"
               {...register("contactNumber")}
               type="tel"
               className="w-full border rounded p-2"
             />
-            {errors.contactNumber && <p className="text-red-500 text-xs">{errors.contactNumber.message}</p>}
+            {errors.contactNumber && <p className="text-red-700 text-xs">{errors.contactNumber.message}</p>}
           </div>
         </div>
       </fieldset>
@@ -122,26 +123,26 @@ export default function EmploymentConsentStep({ initial, onSubmit, onBack }: Pro
       <fieldset className="border rounded p-4">
         <legend className="font-semibold px-2">Privacy Consent & Attestation</legend>
         <div className="space-y-4">
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input type="checkbox" {...register("consentGiven")} className="mt-1 w-5 h-5" />
+          <label htmlFor="consentGiven" className="flex items-start gap-2 cursor-pointer">
+            <input id="consentGiven" type="checkbox" {...register("consentGiven")} className="mt-1 w-5 h-5" />
             <span className="text-sm">
               I consent to the collection and processing of my personal information in accordance with the Data Privacy Act of 2012 (RA 10173).
             </span>
           </label>
-          {errors.consentGiven && <p className="text-red-500 text-xs">{errors.consentGiven.message}</p>}
+          {errors.consentGiven && <p className="text-red-700 text-xs">{errors.consentGiven.message}</p>}
 
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input type="checkbox" {...register("attestation")} className="mt-1 w-5 h-5" />
+          <label htmlFor="attestation" className="flex items-start gap-2 cursor-pointer">
+            <input id="attestation" type="checkbox" {...register("attestation")} className="mt-1 w-5 h-5" />
             <span className="text-sm">
               I attest that all information provided is true, complete, and accurate to the best of my knowledge.
             </span>
           </label>
-          {errors.attestation && <p className="text-red-500 text-xs">{errors.attestation.message}</p>}
+          {errors.attestation && <p className="text-red-700 text-xs">{errors.attestation.message}</p>}
 
           <div>
-            <label className="block text-sm font-medium">Full Name (as signature) *</label>
-            <input {...register("signatureName")} className="w-full border rounded p-2" />
-            {errors.signatureName && <p className="text-red-500 text-xs">{errors.signatureName.message}</p>}
+            <label htmlFor="signatureName" className="block text-sm font-medium">Full Name (as signature) *</label>
+            <input id="signatureName" {...register("signatureName")} className="w-full border rounded p-2" />
+            {errors.signatureName && <p className="text-red-700 text-xs">{errors.signatureName.message}</p>}
           </div>
         </div>
       </fieldset>
