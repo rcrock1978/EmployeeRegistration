@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release --verbosity quiet
+
+      - name: Architecture tests
+        run: dotnet test tests/Members.Domain.UnitTests --no-restore --configuration Release --verbosity normal
+
+      - name: Integration tests
+        run: dotnet test tests/Members.Api.IntegrationTests --no-restore --configuration Release --verbosity normal
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+        working-directory: frontend
+
+      - name: Lint
+        run: npm run lint
+        working-directory: frontend
+
+      - name: Type check
+        run: npx tsc -b
+        working-directory: frontend
+
+      - name: Unit tests
+        run: npm run test
+        working-directory: frontend
+
+      - name: Build
+        run: npm run build
+        working-directory: frontend
