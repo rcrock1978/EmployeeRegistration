@@ -147,4 +147,12 @@ app.UseAuthorization();
 app.MapHealthEndpoints();
 app.MapMembersEndpoints();
 
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<MembersDbContext>();
+    await db.Database.MigrateAsync();
+    await DataSeeder.SeedAsync(db);
+}
+
 app.Run();
