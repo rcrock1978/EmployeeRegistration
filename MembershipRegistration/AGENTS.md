@@ -9,8 +9,9 @@ For the latest implementation plan and feature context, read `specs/001-member-r
 - **All implementation phases complete (P0–P4).** Full-stack member registration platform: .NET 10 REST API + React SPA wizard.
 - Build: 0 errors, 2 warnings (MSB3277 pre-release EF Core version conflict, non-blocking).
 - Architecture tests: 6/6 passing (inward-only Clean Architecture dependency enforcement).
-- Frontend: 0 errors, 317 KB JS production bundle (93 KB gzipped).
-- Integration tests require Docker (PostgreSQL via Testcontainers) — cannot run on this machine.
+- Integration tests: 5/5 passing (Docker + Testcontainers PostgreSQL available on this machine).
+- Frontend: 0 errors, 7/7 component tests passing, 317 KB JS production bundle (93 KB gzipped).
+- CI pipeline: GitHub Actions runs backend build/test, architecture tests, frontend lint/type-check/test/build.
 
 ## Source of truth
 
@@ -98,10 +99,23 @@ For the latest implementation plan and feature context, read `specs/001-member-r
 - `appsettings.json`, `appsettings.Development.json`
 
 ## Remaining / Blocked
-- Integration tests require Docker with PostgreSQL container (`docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16-alpine`)
-- Performance benchmarks (k6 script not written)
-- WCAG 2.1 AA accessibility audit (requires Pa11y CI or axe-core runner)
-- Frontend component tests (React Testing Library not set up)
+- (none) — all P0–P4 implementation tasks and Phase 9 quality gates are complete.
+
+## Completed Quality Gates
+- Integration tests: 5/5 green against Testcontainers PostgreSQL
+- Architecture tests: 6/6 green (NetArchTest Clean Architecture enforcement)
+- Frontend build: clean TypeScript compilation and production bundle
+- Frontend component tests: 7/7 passing (React Testing Library + Vitest)
+- WCAG 2.1 AA audit: 0 critical/serious violations
+- Performance benchmark script: `tests/Performance/benchmark.js` (k6) written with p95 targets
+- Secret scan: no keys, connection strings, or certificates committed (dev-only `postgres/postgres` in `appsettings.Development.json`)
+- PII redaction: active in `LoggingBehavior` for TIN, SSS, email, and phone patterns
+
+## Docker Compose
+- `docker-compose.yml` orchestrates PostgreSQL 16, the .NET API, and the React SPA.
+- Frontend image is built from `frontend/Dockerfile` (Node build + Nginx) and exposed on `http://localhost:3000`.
+- Nginx proxies `/api/` and `/health/` to the API service.
+- API exposed on `http://localhost:5000`; database on `localhost:5432`.
 
 ## Speckit workflow tooling
 

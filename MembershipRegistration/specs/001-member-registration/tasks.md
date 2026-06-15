@@ -57,9 +57,9 @@ description: "Task list for 001-member-registration feature implementation"
 - [X] T019 [P] Implement `GlobalExceptionHandler` middleware in `src/Members.WebApi/Infrastructure/GlobalExceptionHandler.cs` that maps unhandled exceptions to the uniform error envelope
 - [X] T020 [P] Configure `/health/live` (always 200) and `/health/ready` (reflects DB connectivity via EF Core ping) in `src/Members.WebApi/Endpoints/HealthEndpoints.cs`
 - [X] T021 [P] Configure Scalar v1 OpenAPI UI in `src/Members.WebApi/Program.cs` — enabled only in non-production
-- [ ] T022 [P] Create initial EF Core migration in `src/Members.Infrastructure/Persistence/Migrations/` — requires PostgreSQL running; run `dotnet ef migrations add InitialCreate`
-- [ ] T023 [P] Create `tests/Members.Api.IntegrationTests/HealthCheckTests.cs` — verify `/health/live` returns 200 and `/health/ready` returns 200/503 based on DB state
-- [ ] T024 [P] Configure CI pipeline (GitHub Actions or equivalent) that runs build, all test projects, and NetArchTest architecture rule enforcement
+- [X] T022 [P] Create initial EF Core migration in `src/Members.Infrastructure/Persistence/Migrations/` — requires PostgreSQL running; run `dotnet ef migrations add InitialCreate`
+- [X] T023 [P] Create `tests/Members.Api.IntegrationTests/HealthCheckTests.cs` — verify `/health/live` returns 200 and `/health/ready` returns 200/503 based on DB state
+- [X] T024 [P] Configure CI pipeline (GitHub Actions or equivalent) that runs build, all test projects, and NetArchTest architecture rule enforcement
 - [X] T025 [P] Write NetArchTest rules in `tests/Members.Domain.UnitTests/ArchitectureTests.cs` enforcing inward-only Clean Architecture dependency direction
 - [X] T026 [P] Register all services in `src/Members.WebApi/Program.cs` — DI setup for DbContext, Sender, validators, behaviors, exception handler, health checks, Scalar
 
@@ -77,23 +77,23 @@ description: "Task list for 001-member-registration feature implementation"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation.
 
-- [ ] T027 [P] [US1] Write `RegisterMember_ValidRequest_Returns201` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberTests.cs`
-- [ ] T028 [P] [US1] Write `RegisterMember_InvalidPayload_Returns422` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberTests.cs`
-- [ ] T029 [P] [US1] Write `RegisterMember_DuplicateEmail_Returns409` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberTests.cs`
-- [ ] T030 [P] [US1] Write unit tests for `RegisterMemberCommandValidator` in `tests/Members.Application.UnitTests/Features/Members/RegisterMember/RegisterMemberCommandValidatorTests.cs`
-- [ ] T031 [US1] Write unit tests for domain value-object invariants (PersonName, Demographics, ContactDetails, Address, GovernmentIds, EmploymentDetails) in `tests/Members.Domain.UnitTests/`
+- [X] T027 [P] [US1] Write `RegisterMember_ValidRequest_Returns201` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberTests.cs`
+- [X] T028 [P] [US1] Write `RegisterMember_InvalidPayload_Returns422` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberTests.cs`
+- [X] T029 [P] [US1] Write `RegisterMember_DuplicateEmail_Returns409` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberTests.cs`
+- [X] T030 [P] [US1] Write unit tests for `RegisterMemberCommandValidator` in `tests/Members.Application.UnitTests/Features/Members/RegisterMember/RegisterMemberCommandValidatorTests.cs`
+- [X] T031 [US1] Write unit tests for domain value-object invariants (PersonName, Demographics, ContactDetails, Address, GovernmentIds, EmploymentDetails) in `tests/Members.Domain.UnitTests/`
 
 ### Implementation for User Story 1
 
-- [ ] T032 [P] [US1] Create value objects in `src/Members.Domain/Members/`: PersonName, Demographics, BirthDetails, ContactDetails, DependentInfo, RelatedPersons (Spouse, Mother, Father), GovernmentIds, PrimaryIdentification, Address (current/permanent), EmergencyContact, EmploymentDetails, MemberStatus enum
-- [ ] T033 [P] [US1] Create `Member` aggregate root in `src/Members.Domain/Members/Member.cs` with all value objects, audit metadata, and factory method `Member.Create(...)`
-- [ ] T034 [P] [US1] Create `RegisterMemberCommand` and `RegisterMemberResponse` in `src/Members.Application/Features/Members/RegisterMember/`
-- [ ] T035 [P] [US1] Create `RegisterMemberCommandValidator` (FluentValidation) in `src/Members.Application/Features/Members/RegisterMember/` — mirror all domain rules
-- [ ] T036 [US1] Create `RegisterMemberCommandHandler` in `src/Members.Application/Features/Members/RegisterMember/` — validates, checks email uniqueness, creates Member, persists, returns response
-- [ ] T037 [P] [US1] Create `MemberConfiguration` EF Core entity configuration in `src/Members.Infrastructure/Persistence/Configurations/MemberConfiguration.cs` — map all value objects as owned entities or value conversions
-- [ ] T038 [P] [US1] Create `Persistence/Migrations/<timestamp>_CreateMemberTable.cs` migration
-- [ ] T039 [US1] Implement `POST /api/members` endpoint in `src/Members.WebApi/Endpoints/MembersEndpoints.cs` — calls `ISender.Send`, maps `Result<T>` to HTTP responses
-- [ ] T040 [US1] Wire `RegisterMember` vertical slice in `src/Members.WebApi/Program.cs` — register validator, handler, and endpoint
+- [X] T032 [P] [US1] Create value objects in `src/Members.Domain/Members/`: PersonName, Demographics, BirthDetails, ContactDetails, DependentInfo, RelatedPersons (Spouse, Mother, Father), GovernmentIds, PrimaryIdentification, Address (current/permanent), EmergencyContact, EmploymentDetails, MemberStatus enum
+- [X] T033 [P] [US1] Create `Member` aggregate root in `src/Members.Domain/Members/Member.cs` with all value objects, audit metadata, and factory method `Member.Create(...)`
+- [X] T034 [P] [US1] Create `RegisterMemberCommand` and `RegisterMemberResponse` in `src/Members.Application/Features/Members/RegisterMember/`
+- [X] T035 [P] [US1] Create `RegisterMemberCommandValidator` (FluentValidation) in `src/Members.Application/Features/Members/RegisterMember/` — mirror all domain rules
+- [X] T036 [US1] Create `RegisterMemberCommandHandler` in `src/Members.Application/Features/Members/RegisterMember/` — validates, checks email uniqueness, creates Member, persists, returns response
+- [X] T037 [P] [US1] Create `MemberConfiguration` EF Core entity configuration in `src/Members.Infrastructure/Persistence/Configurations/MemberConfiguration.cs` — map all value objects as owned entities or value conversions
+- [X] T038 [P] [US1] Create `Persistence/Migrations/<timestamp>_CreateMemberTable.cs` migration
+- [X] T039 [US1] Implement `POST /api/members` endpoint in `src/Members.WebApi/Endpoints/MembersEndpoints.cs` — calls `ISender.Send`, maps `Result<T>` to HTTP responses
+- [X] T040 [US1] Wire `RegisterMember` vertical slice in `src/Members.WebApi/Program.cs` — register validator, handler, and endpoint
 
 **Checkpoint**: US1 fully functional — `POST /api/members` creates valid member records and rejects invalid/duplicate submissions.
 
@@ -116,25 +116,25 @@ description: "Task list for 001-member-registration feature implementation"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation.
 
-- [ ] T040a [P] [US2] Write `RegistrationWizard_PreservesDataOnBackNav` component test in `frontend/tests/RegistrationWizard.test.tsx`
-- [ ] T040b [P] [US2] Write `AddressToggle_CopiesAndHidesPermanentAddress` component test in `frontend/tests/AddressToggle.test.tsx`
-- [ ] T040c [P] [US2] Write `Validation_ShowsOnBlur` component test in `frontend/tests/Validation.test.tsx`
-- [ ] T040d [P] [US2] Write `memberApi_Submit_HandlesSuccessAndError` unit test in `frontend/tests/memberApi.test.ts`
+- [X] T040a [P] [US2] Write `RegistrationWizard_PreservesDataOnBackNav` component test in `frontend/tests/RegistrationWizard.test.tsx`
+- [X] T040b [P] [US2] Write `AddressToggle_CopiesAndHidesPermanentAddress` component test in `frontend/tests/AddressToggle.test.tsx`
+- [X] T040c [P] [US2] Write `Validation_ShowsOnBlur` component test in `frontend/tests/Validation.test.tsx`
+- [X] T040d [P] [US2] Write `memberApi_Submit_HandlesSuccessAndError` unit test in `frontend/tests/memberApi.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T041 [P] [US2] Create multi-step wizard layout in `frontend/src/features/registration/RegistrationWizard.tsx` with visible step indicator and navigation (Next/Back) following the 5-step order in spec.md
-- [ ] T042 [P] [US2] Create step components under `frontend/src/features/registration/steps/`: `PersonalInfoStep`, `FamilyAndRelatedPersonsStep`, `GovernmentIdsStep`, `ResidencyStep`, `EmploymentAndConsentStep`
-- [ ] T043 [P] [US2] Create Zod validation schemas in `frontend/src/schemas/registrationSchema.ts` — one schema per step, mirroring server FluentValidation rules
-- [ ] T044 [P] [US2] Create `useRegistrationWizard` hook in `frontend/src/hooks/useRegistrationWizard.ts` — manages current step, form state persistence across steps, async submission
-- [ ] T045 [P] [US2] Implement address copy toggle ("Permanent address same as current") in `ContactAndAddressStep.tsx` — RHF `watch` triggers copy on check, restores editable form on uncheck
-- [ ] T046 [P] [US2] Implement field-level validation on blur with Zod + React Hook Form `mode: 'onBlur'` in each step component
-- [ ] T047 [P] [US2] Create `frontend/src/services/memberApi.ts` — API client for `POST /api/members` with typed request/response and error handling
-- [ ] T048 [US2] Wire submission in `ReviewAndConsentStep.tsx` — calls API client, handles success/validation-failure/server-error states, maps server errors back to fields
-- [ ] T049 [P] [US2] Configure Tailwind CSS for mobile-first responsive layout, dark mode, 44×44 px touch targets, correct input keyboards (type="email", type="tel")
-- [ ] T050 [US2] Implement `App.tsx` in `frontend/src/` — renders `RegistrationWizard` at `/` with React Router
-- [ ] T050a [P] [US2] Create `ThemeProvider` React context in `frontend/src/hooks/useTheme.ts` — reads `prefers-color-scheme`, persists choice in localStorage, exposes toggle function
-- [ ] T050b [US2] Add dark mode toggle button (sun/moon icon) to `App.tsx` or wizard header — applies `dark` class to `<html>` element when active
+- [X] T041 [P] [US2] Create multi-step wizard layout in `frontend/src/features/registration/RegistrationWizard.tsx` with visible step indicator and navigation (Next/Back) following the 5-step order in spec.md
+- [X] T042 [P] [US2] Create step components under `frontend/src/features/registration/steps/`: `PersonalInfoStep`, `FamilyAndRelatedPersonsStep`, `GovernmentIdsStep`, `ResidencyStep`, `EmploymentAndConsentStep`
+- [X] T043 [P] [US2] Create Zod validation schemas in `frontend/src/schemas/registrationSchema.ts` — one schema per step, mirroring server FluentValidation rules
+- [X] T044 [P] [US2] Create `useRegistrationWizard` hook in `frontend/src/hooks/useRegistrationWizard.ts` — manages current step, form state persistence across steps, async submission
+- [X] T045 [P] [US2] Implement address copy toggle ("Permanent address same as current") in `ContactAndAddressStep.tsx` — RHF `watch` triggers copy on check, restores editable form on uncheck
+- [X] T046 [P] [US2] Implement field-level validation on blur with Zod + React Hook Form `mode: 'onBlur'` in each step component
+- [X] T047 [P] [US2] Create `frontend/src/services/memberApi.ts` — API client for `POST /api/members` with typed request/response and error handling
+- [X] T048 [US2] Wire submission in `ReviewAndConsentStep.tsx` — calls API client, handles success/validation-failure/server-error states, maps server errors back to fields
+- [X] T049 [P] [US2] Configure Tailwind CSS for mobile-first responsive layout, dark mode, 44×44 px touch targets, correct input keyboards (type="email", type="tel")
+- [X] T050 [US2] Implement `App.tsx` in `frontend/src/` — renders `RegistrationWizard` at `/` with React Router
+- [X] T050a [P] [US2] Create `ThemeProvider` React context in `frontend/src/hooks/useTheme.ts` — reads `prefers-color-scheme`, persists choice in localStorage, exposes toggle function
+- [X] T050b [US2] Add dark mode toggle button (sun/moon icon) to `App.tsx` or wizard header — applies `dark` class to `<html>` element when active
 
 **Checkpoint**: US2 fully functional — frontend wizard navigates with data persistence, address toggle works, inline validation shows on blur, async submit succeeds with server feedback.
 
@@ -150,21 +150,21 @@ description: "Task list for 001-member-registration feature implementation"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation.
 
-- [ ] T051 [P] [US3] Write `RegisterMember_WithoutConsent_Returns422` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberConsentTests.cs`
-- [ ] T052 [P] [US3] Write `SensitiveFields_EncryptedAtRest` integration test in `tests/Members.Api.IntegrationTests/Members/SensitiveFieldEncryptionTests.cs` — verify raw DB column contains ciphertext
-- [ ] T053 [P] [US3] Write `SensitiveFields_NotInLogOutput` integration test in `tests/Members.Api.IntegrationTests/Members/SensitiveFieldEncryptionTests.cs` — capture logged output, verify no SPI in clear
-- [ ] T054 [US3] Write unit test for `ConsentRequiredValidator` in `tests/Members.Application.UnitTests/Features/Members/RegisterMember/ConsentValidationTests.cs`
+- [X] T051 [P] [US3] Write `RegisterMember_WithoutConsent_Returns422` integration test in `tests/Members.Api.IntegrationTests/Members/RegisterMemberConsentTests.cs`
+- [X] T052 [P] [US3] Write `SensitiveFields_EncryptedAtRest` integration test in `tests/Members.Api.IntegrationTests/Members/SensitiveFieldEncryptionTests.cs` — verify raw DB column contains ciphertext
+- [X] T053 [P] [US3] Write `SensitiveFields_NotInLogOutput` integration test in `tests/Members.Api.IntegrationTests/Members/SensitiveFieldEncryptionTests.cs` — capture logged output, verify no SPI in clear
+- [X] T054 [US3] Write unit test for `ConsentRequiredValidator` in `tests/Members.Application.UnitTests/Features/Members/RegisterMember/ConsentValidationTests.cs`
 
 ### Implementation for User Story 3
 
-- [ ] T055 [P] [US3] Create `Consent` value object in `src/Members.Domain/Members/Consent.cs` with `PrivacyAccepted`, `AttestationAccepted`, `SignatureName`, `SignedAtUtc`; add invariant that both must be true
-- [ ] T056 [US3] Update `Member` aggregate root to include `Consent` value object
-- [ ] T057 [P] [US3] Implement `Aes256GcmEncryption` service in `src/Members.Infrastructure/Encryption/Aes256GcmEncryption.cs` — encrypt/decrypt methods, key fetched from a secrets manager (e.g., Azure Key Vault, AWS Secrets Manager, or HashiCorp Vault) via `IConfiguration`
-- [ ] T058 [US3] Create EF Core value converter for encrypted fields in `src/Members.Infrastructure/Persistence/Converters/EncryptedStringConverter.cs` — auto-encrypt on write, auto-decrypt on read for TIN, SSS, PrimaryIdNumber
-- [ ] T059 [US3] Update `RegisterMemberCommandValidator` to reject submission when consent flags are not both true
-- [ ] T060 [P] [US3] Add PII redaction patterns to `LoggingBehavior` in `src/Members.Application/Common/Behaviors/LoggingBehavior.cs` — mask TIN, SSS, phone, email in log output
-- [ ] T061 [P] [US3] Implement `SensitiveFieldAccessLogger` in `src/Members.Infrastructure/Security/SensitiveFieldAccessLogger.cs` — logs who accessed which sensitive fields and when
-- [ ] T062 [US3] Wire encryption, redaction, access logger in `src/Members.WebApi/Program.cs`
+- [X] T055 [P] [US3] Create `Consent` value object in `src/Members.Domain/Members/Consent.cs` with `PrivacyAccepted`, `AttestationAccepted`, `SignatureName`, `SignedAtUtc`; add invariant that both must be true
+- [X] T056 [US3] Update `Member` aggregate root to include `Consent` value object
+- [X] T057 [P] [US3] Implement `Aes256GcmEncryption` service in `src/Members.Infrastructure/Encryption/Aes256GcmEncryption.cs` — encrypt/decrypt methods, key fetched from a secrets manager (e.g., Azure Key Vault, AWS Secrets Manager, or HashiCorp Vault) via `IConfiguration`
+- [X] T058 [US3] Create EF Core value converter for encrypted fields in `src/Members.Infrastructure/Persistence/Converters/EncryptedStringConverter.cs` — auto-encrypt on write, auto-decrypt on read for TIN, SSS, PrimaryIdNumber
+- [X] T059 [US3] Update `RegisterMemberCommandValidator` to reject submission when consent flags are not both true
+- [X] T060 [P] [US3] Add PII redaction patterns to `LoggingBehavior` in `src/Members.Application/Common/Behaviors/LoggingBehavior.cs` — mask TIN, SSS, phone, email in log output
+- [X] T061 [P] [US3] Implement `SensitiveFieldAccessLogger` in `src/Members.Infrastructure/Security/SensitiveFieldAccessLogger.cs` — logs who accessed which sensitive fields and when
+- [X] T062 [US3] Wire encryption, redaction, access logger in `src/Members.WebApi/Program.cs`
 
 **Checkpoint**: US3 fully functional — consent gate enforced, sensitive identifiers encrypted at rest, no SPI in logs, access logged.
 
@@ -180,27 +180,27 @@ description: "Task list for 001-member-registration feature implementation"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation.
 
-- [ ] T063 [P] [US4] Write `GetMemberById_ExistingMember_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/GetMemberByIdTests.cs`
-- [ ] T064 [P] [US4] Write `GetMemberById_NonExistent_Returns404` integration test in `tests/Members.Api.IntegrationTests/Members/GetMemberByIdTests.cs`
-- [ ] T065 [P] [US4] Write `ListMembers_WithFilters_ReturnsPagedResults` integration test in `tests/Members.Api.IntegrationTests/Members/ListMembersTests.cs`
-- [ ] T066 [P] [US4] Write `UpdateMember_ValidRequest_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/UpdateMemberTests.cs`
-- [ ] T067 [P] [US4] Write `UpdateMember_NonExistent_Returns404` integration test in `tests/Members.Api.IntegrationTests/Members/UpdateMemberTests.cs`
-- [ ] T068 [P] [US4] Write unit tests for `GetMemberByIdQueryValidator` and `UpdateMemberCommandValidator` in `tests/Members.Application.UnitTests/Features/Members/`
+- [X] T063 [P] [US4] Write `GetMemberById_ExistingMember_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/GetMemberByIdTests.cs`
+- [X] T064 [P] [US4] Write `GetMemberById_NonExistent_Returns404` integration test in `tests/Members.Api.IntegrationTests/Members/GetMemberByIdTests.cs`
+- [X] T065 [P] [US4] Write `ListMembers_WithFilters_ReturnsPagedResults` integration test in `tests/Members.Api.IntegrationTests/Members/ListMembersTests.cs`
+- [X] T066 [P] [US4] Write `UpdateMember_ValidRequest_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/UpdateMemberTests.cs`
+- [X] T067 [P] [US4] Write `UpdateMember_NonExistent_Returns404` integration test in `tests/Members.Api.IntegrationTests/Members/UpdateMemberTests.cs`
+- [X] T068 [P] [US4] Write unit tests for `GetMemberByIdQueryValidator` and `UpdateMemberCommandValidator` in `tests/Members.Application.UnitTests/Features/Members/`
 
 ### Implementation for User Story 4
 
-- [ ] T069 [P] [US4] Create `GetMemberByIdQuery` and `GetMemberByIdResponse` in `src/Members.Application/Features/Members/GetMemberById/`
-- [ ] T070 [P] [US4] Create `GetMemberByIdQueryValidator` in `src/Members.Application/Features/Members/GetMemberById/`
-- [ ] T071 [US4] Create `GetMemberByIdQueryHandler` in `src/Members.Application/Features/Members/GetMemberById/` — reads member by ID from DbContext, returns response or NotFound
-- [ ] T072 [P] [US4] Create `ListMembersQuery` and `ListMembersResponse` in `src/Members.Application/Features/Members/ListMembers/` — support filters: lastName, email, employmentLevel, createdDateFrom, createdDateTo; paging: page, pageSize (default 20, max 100)
-- [ ] T073 [P] [US4] Create `ListMembersQueryValidator` in `src/Members.Application/Features/Members/ListMembers/`
-- [ ] T074 [US4] Create `ListMembersQueryHandler` in `src/Members.Application/Features/Members/ListMembers/` — applies filters, paginates, returns paged result with total count
-- [ ] T075 [P] [US4] Create `UpdateMemberCommand` and `UpdateMemberResponse` in `src/Members.Application/Features/Members/UpdateMember/`
-- [ ] T076 [P] [US4] Create `UpdateMemberCommandValidator` in `src/Members.Application/Features/Members/UpdateMember/`
-- [ ] T077 [US4] Create `UpdateMemberCommandHandler` in `src/Members.Application/Features/Members/UpdateMember/` — loads, applies changes, saves, updates audit metadata, returns response
-- [ ] T078 [P] [US4] Implement `GET /api/members/{id}` endpoint in `src/Members.WebApi/Endpoints/MembersEndpoints.cs`
-- [ ] T079 [P] [US4] Implement `GET /api/members` endpoint with query string filters in `src/Members.WebApi/Endpoints/MembersEndpoints.cs`
-- [ ] T080 [US4] Implement `PUT /api/members/{id}` endpoint in `src/Members.WebApi/Endpoints/MembersEndpoints.cs`
+- [X] T069 [P] [US4] Create `GetMemberByIdQuery` and `GetMemberByIdResponse` in `src/Members.Application/Features/Members/GetMemberById/`
+- [X] T070 [P] [US4] Create `GetMemberByIdQueryValidator` in `src/Members.Application/Features/Members/GetMemberById/`
+- [X] T071 [US4] Create `GetMemberByIdQueryHandler` in `src/Members.Application/Features/Members/GetMemberById/` — reads member by ID from DbContext, returns response or NotFound
+- [X] T072 [P] [US4] Create `ListMembersQuery` and `ListMembersResponse` in `src/Members.Application/Features/Members/ListMembers/` — support filters: lastName, email, employmentLevel, createdDateFrom, createdDateTo; paging: page, pageSize (default 20, max 100)
+- [X] T073 [P] [US4] Create `ListMembersQueryValidator` in `src/Members.Application/Features/Members/ListMembers/`
+- [X] T074 [US4] Create `ListMembersQueryHandler` in `src/Members.Application/Features/Members/ListMembers/` — applies filters, paginates, returns paged result with total count
+- [X] T075 [P] [US4] Create `UpdateMemberCommand` and `UpdateMemberResponse` in `src/Members.Application/Features/Members/UpdateMember/`
+- [X] T076 [P] [US4] Create `UpdateMemberCommandValidator` in `src/Members.Application/Features/Members/UpdateMember/`
+- [X] T077 [US4] Create `UpdateMemberCommandHandler` in `src/Members.Application/Features/Members/UpdateMember/` — loads, applies changes, saves, updates audit metadata, returns response
+- [X] T078 [P] [US4] Implement `GET /api/members/{id}` endpoint in `src/Members.WebApi/Endpoints/MembersEndpoints.cs`
+- [X] T079 [P] [US4] Implement `GET /api/members` endpoint with query string filters in `src/Members.WebApi/Endpoints/MembersEndpoints.cs`
+- [X] T080 [US4] Implement `PUT /api/members/{id}` endpoint in `src/Members.WebApi/Endpoints/MembersEndpoints.cs`
 
 **Checkpoint**: US4 fully functional — full CRUD for member records via REST API with paged listing and filtering.
 
@@ -216,18 +216,18 @@ description: "Task list for 001-member-registration feature implementation"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation.
 
-- [ ] T081 [P] [US5] Write `MemberRole_OwnDetail_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
-- [ ] T082 [P] [US5] Write `MemberRole_List_Returns403` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
-- [ ] T083 [P] [US5] Write `MemberRole_OtherDetail_Returns403` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
-- [ ] T084 [P] [US5] Write `HrAdminRole_ListAndDetail_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
+- [X] T081 [P] [US5] Write `MemberRole_OwnDetail_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
+- [X] T082 [P] [US5] Write `MemberRole_List_Returns403` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
+- [X] T083 [P] [US5] Write `MemberRole_OtherDetail_Returns403` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
+- [X] T084 [P] [US5] Write `HrAdminRole_ListAndDetail_Returns200` integration test in `tests/Members.Api.IntegrationTests/Members/RoleBasedAccessTests.cs`
 
 ### Implementation for User Story 5
 
-- [ ] T085 [P] [US5] Create `MemberAuthorizationHandler` in `src/Members.WebApi/Infrastructure/MemberAuthorizationHandler.cs` — reads `sub` and `role` JWT claims, resolves member by `sub` (email), enforces access rules
-- [ ] T086 [US5] Add authorization policy to `GET /api/members/{id}` — Member role: only if `sub` matches record email; HR/Admin role: always allowed
-- [ ] T087 [US5] Add authorization to `GET /api/members` — Member role: 403; HR/Admin role: allowed
-- [ ] T088 [US5] Update `RegisterMemberCommand` to capture `CreatedBy` from JWT `sub` claim
-- [ ] T089 [US5] Wire authorization policies and JWT validation in `src/Members.WebApi/Program.cs`
+- [X] T085 [P] [US5] Create `MemberAuthorizationHandler` in `src/Members.WebApi/Infrastructure/MemberAuthorizationHandler.cs` — reads `sub` and `role` JWT claims, resolves member by `sub` (email), enforces access rules
+- [X] T086 [US5] Add authorization policy to `GET /api/members/{id}` — Member role: only if `sub` matches record email; HR/Admin role: always allowed
+- [X] T087 [US5] Add authorization to `GET /api/members` — Member role: 403; HR/Admin role: allowed
+- [X] T088 [US5] Update `RegisterMemberCommand` to capture `CreatedBy` from JWT `sub` claim
+- [X] T089 [US5] Wire authorization policies and JWT validation in `src/Members.WebApi/Program.cs`
 
 **Checkpoint**: US5 fully functional — RBAC enforced per spec scenarios for both Member and HR/Admin roles.
 
@@ -241,12 +241,12 @@ description: "Task list for 001-member-registration feature implementation"
 
 ### Tests for User Story 6
 
-- [ ] T089a [P] [US6] Write `HealthProbes_ReflectDataStoreState` integration test in `tests/Members.Api.IntegrationTests/HealthCheckTests.cs`
+- [X] T089a [P] [US6] Write `HealthProbes_ReflectDataStoreState` integration test in `tests/Members.Api.IntegrationTests/HealthCheckTests.cs`
 
 ### Implementation for User Story 6
 
-- [ ] T090 [P] [US6] Implement `CorrelationIdMiddleware` in `src/Members.WebApi/Infrastructure/CorrelationIdMiddleware.cs` — reads/generates correlation ID, sets on `HttpContext`, includes in structured log scope
-- [ ] T091 [P] [US6] Update health check endpoints in `src/Members.WebApi/Endpoints/HealthEndpoints.cs` — readiness checks datastore via EF Core, liveness simple 200
+- [X] T090 [P] [US6] Implement `CorrelationIdMiddleware` in `src/Members.WebApi/Infrastructure/CorrelationIdMiddleware.cs` — reads/generates correlation ID, sets on `HttpContext`, includes in structured log scope
+- [X] T091 [P] [US6] Update health check endpoints in `src/Members.WebApi/Endpoints/HealthEndpoints.cs` — readiness checks datastore via EF Core, liveness simple 200
 - [X] T092 [P] [US6] Add structured logging configuration (Serilog or `ILogger` with structured templates) in `src/Members.WebApi/Program.cs` — log level, output template with correlation ID
 **Checkpoint**: US6 fully functional — health probes accurately reflect service state, every request traceable via correlation ID.
 
@@ -256,15 +256,15 @@ description: "Task list for 001-member-registration feature implementation"
 
 **Purpose**: Improvements that affect multiple user stories and final quality gates.
 
-- [ ] T094 [P] Run all integration tests with Testcontainers PostgreSQL — green build required
-- [ ] T095 [P] Run NetArchTest architecture rules — verify inward-only Clean Architecture dependencies
-- [ ] T096 [P] Run frontend build (`npm run build`) — verify clean TypeScript compilation
-- [ ] T097 [P] Validate all 11 quickstart scenarios from `specs/001-member-registration/quickstart.md`
-- [ ] T098 [P] Final review: verify no secrets, connection strings, or keys in source code
-- [ ] T099 [P] Final review: verify PII redaction active in logging behavior
-- [ ] T100 [P] Update `AGENTS.md` SPECKIT markers to reference tasks.md and reflect implementation status
-- [ ] T100a [P] Run WCAG 2.1 AA accessibility audit using axe-core (`@axe-core/react` or Pa11y CI) in `frontend/` — assert zero critical/serious violations
-- [ ] T100b [P] Write performance benchmark script (k6 or `dotnet-counters`) that asserts p95 `POST /api/members` ≤ 400ms, p95 `GET /api/members/{id}` ≤ 200ms, p95 `GET /api/members` ≤ 200ms in `tests/Members.PerformanceTests/`
+- [X] T094 [P] Run all integration tests with Testcontainers PostgreSQL — green build required
+- [X] T095 [P] Run NetArchTest architecture rules — verify inward-only Clean Architecture dependencies
+- [X] T096 [P] Run frontend build (`npm run build`) — verify clean TypeScript compilation
+- [X] T097 [P] Validate all 11 quickstart scenarios from `specs/001-member-registration/quickstart.md`
+- [X] T098 [P] Final review: verify no secrets, connection strings, or keys in source code
+- [X] T099 [P] Final review: verify PII redaction active in logging behavior
+- [X] T100 [P] Update `AGENTS.md` SPECKIT markers to reference tasks.md and reflect implementation status
+- [X] T100a [P] Run WCAG 2.1 AA accessibility audit using axe-core (`@axe-core/react` or Pa11y CI) in `frontend/` — assert zero critical/serious violations
+- [X] T100b [P] Write performance benchmark script (k6 or `dotnet-counters`) that asserts p95 `POST /api/members` ≤ 400ms, p95 `GET /api/members/{id}` ≤ 200ms, p95 `GET /api/members` ≤ 200ms in `tests/Members.PerformanceTests/`
 
 ---
 
