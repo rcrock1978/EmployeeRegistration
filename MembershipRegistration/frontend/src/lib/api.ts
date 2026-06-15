@@ -1,6 +1,6 @@
 import type { Envelope, LoginResponse, MemberListItem, MemberDetail, PagedResult } from "../types/api";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:5001";
 
 export async function registerMember(data: unknown): Promise<Response> {
   return fetch(`${API_BASE}/api/members`, {

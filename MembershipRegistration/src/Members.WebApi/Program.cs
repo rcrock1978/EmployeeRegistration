@@ -121,6 +121,14 @@ builder.Services.AddScoped<IPipelineBehavior, LoggingBehavior>();
 #pragma warning restore CA2263
 builder.Services.AddScoped<ISender, Sender>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.Scan(scan => scan
     .FromAssemblies(typeof(Members.Application.Common.Results.Result).Assembly)
     .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<,>)))
@@ -143,6 +151,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseCors();
 
 if (!app.Environment.IsDevelopment())
 {

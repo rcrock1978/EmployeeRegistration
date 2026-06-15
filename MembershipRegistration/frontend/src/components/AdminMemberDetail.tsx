@@ -37,31 +37,31 @@ export default function AdminMemberDetail() {
       </button>
 
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        {member.personName.firstName} {member.personName.lastName}
+        {member.personalInfo.firstName} {member.personalInfo.lastName}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <section className="border rounded p-4">
           <h2 className="font-semibold mb-3">Personal Info</h2>
-          <DetailRow label="Title" value={member.personName.title} />
-          <DetailRow label="First Name" value={member.personName.firstName} />
-          <DetailRow label="Middle Name" value={member.personName.middleName} />
-          <DetailRow label="Last Name" value={member.personName.lastName} />
-          <DetailRow label="Suffix" value={member.personName.suffix} />
-          <DetailRow label="Alias" value={member.personName.alias} />
-          <DetailRow label="Date of Birth" value={member.demographics.dateOfBirth} />
-          <DetailRow label="Place of Birth" value={member.demographics.placeOfBirth} />
-          <DetailRow label="Nationality" value={member.demographics.nationality} />
-          <DetailRow label="Gender" value={member.demographics.gender} />
-          <DetailRow label="Civil Status" value={member.demographics.civilStatus} />
-          <DetailRow label="Education" value={member.demographics.highestEducationalAttainment} />
+          <DetailRow label="Title" value={member.personalInfo.title} />
+          <DetailRow label="First Name" value={member.personalInfo.firstName} />
+          <DetailRow label="Middle Name" value={member.personalInfo.middleName} />
+          <DetailRow label="Last Name" value={member.personalInfo.lastName} />
+          <DetailRow label="Suffix" value={member.personalInfo.suffix} />
+          <DetailRow label="Alias" value={member.personalInfo.alias} />
+          <DetailRow label="Date of Birth" value={member.personalInfo.dateOfBirth} />
+          <DetailRow label="Place of Birth" value={member.personalInfo.placeOfBirth} />
+          <DetailRow label="Nationality" value={member.personalInfo.nationality} />
+          <DetailRow label="Gender" value={member.personalInfo.gender} />
+          <DetailRow label="Civil Status" value={member.personalInfo.civilStatus} />
+          <DetailRow label="Education" value={member.personalInfo.highestEducationalAttainment} />
+          <DetailRow label="Number of Dependents" value={String(member.personalInfo.numberOfDependents)} />
         </section>
 
         <section className="border rounded p-4">
           <h2 className="font-semibold mb-3">Contact</h2>
-          <DetailRow label="Email" value={member.contactDetails.emailAddress} />
-          <DetailRow label="Phone" value={member.contactDetails.contactNumber} />
-          <DetailRow label="Dependents" value={String(member.numberOfDependents)} />
+          <DetailRow label="Email" value={member.contactInfo.emailAddress} />
+          <DetailRow label="Phone" value={member.contactInfo.contactNumber} />
         </section>
 
         <section className="border rounded p-4">
@@ -134,12 +134,10 @@ export default function AdminMemberDetail() {
 
         <section className="border rounded p-4">
           <h2 className="font-semibold mb-3">Status & Consent</h2>
-          <DetailRow label="Status" value={member.status} />
+          <DetailRow label="Status" value={member.status.displayName} />
           <DetailRow label="Consent Given" value={member.consent.consentGiven ? "Yes" : "No"} />
           <DetailRow label="Attestation" value={member.consent.attestation ? "Yes" : "No"} />
           <DetailRow label="Signed By" value={member.consent.signatureName} />
-          <DetailRow label="Created" value={new Date(member.createdOn).toLocaleString()} />
-          {member.updatedOn && <DetailRow label="Updated" value={new Date(member.updatedOn).toLocaleString()} />}
         </section>
       </div>
     </div>

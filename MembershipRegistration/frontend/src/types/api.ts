@@ -160,15 +160,13 @@ export interface PagedResult<T> {
 
 export interface MemberDetail {
   id: string;
-  personName: {
+  personalInfo: {
     title: string;
     firstName: string;
     middleName?: string;
     lastName: string;
     suffix?: string;
     alias?: string;
-  };
-  demographics: {
     dateOfBirth: string;
     placeOfBirth: string;
     countryOfBirth: string;
@@ -177,12 +175,12 @@ export interface MemberDetail {
     civilStatus: string;
     religion?: string;
     highestEducationalAttainment: string;
+    numberOfDependents: number;
   };
-  contactDetails: {
+  contactInfo: {
     emailAddress: string;
     contactNumber: string;
   };
-  numberOfDependents: number;
   relatedPersons: {
     spouse?: { firstName: string; middleName?: string; lastName: string };
     motherMaidenName?: string;
@@ -215,7 +213,8 @@ export interface MemberDetail {
     attestation: boolean;
     signatureName: string;
   };
-  status: string;
-  createdOn: string;
-  updatedOn?: string;
+  status: {
+    code: string;
+    displayName: string;
+  };
 }
