@@ -1,3 +1,4 @@
+using Members.Application.Common;
 using Members.Application.Common.Messaging;
 using Members.Application.Common.Results;
 using Members.Domain.Members;
@@ -7,10 +8,12 @@ namespace Members.Application.Features.Members.RegisterMember;
 public sealed class RegisterMemberCommandHandler : ICommandHandler<RegisterMemberCommand, RegisterMemberResponse>
 {
     private readonly IMemberRepository _repository;
+    private readonly IMemberSubmissionLogger _submissionLogger;
 
-    public RegisterMemberCommandHandler(IMemberRepository repository)
+    public RegisterMemberCommandHandler(IMemberRepository repository, IMemberSubmissionLogger submissionLogger)
     {
         _repository = repository;
+        _submissionLogger = submissionLogger;
     }
 
     public async Task<Result<RegisterMemberResponse>> Handle(RegisterMemberCommand command, CancellationToken cancellationToken)
@@ -123,6 +126,12 @@ public sealed class RegisterMemberCommandHandler : ICommandHandler<RegisterMembe
 
         await _repository.AddAsync(member, cancellationToken);
         await _repository.SaveChangesAsync(cancellationToken);
+
+        await _submissionLogger.LogSubmissionAsync(
+            member.Id,
+            command.PersonalInfo.FirstName,
+            command.PersonalInfo.LastName,
+            command);
 
         return Result.Success(new RegisterMemberResponse(member.Id));
     }

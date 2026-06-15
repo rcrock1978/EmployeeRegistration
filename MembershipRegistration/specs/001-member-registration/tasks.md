@@ -247,7 +247,7 @@ description: "Task list for 001-member-registration feature implementation"
 
 - [ ] T090 [P] [US6] Implement `CorrelationIdMiddleware` in `src/Members.WebApi/Infrastructure/CorrelationIdMiddleware.cs` — reads/generates correlation ID, sets on `HttpContext`, includes in structured log scope
 - [ ] T091 [P] [US6] Update health check endpoints in `src/Members.WebApi/Endpoints/HealthEndpoints.cs` — readiness checks datastore via EF Core, liveness simple 200
-- [ ] T092 [P] [US6] Add structured logging configuration (Serilog or `ILogger` with structured templates) in `src/Members.WebApi/Program.cs` — log level, output template with correlation ID
+- [X] T092 [P] [US6] Add structured logging configuration (Serilog or `ILogger` with structured templates) in `src/Members.WebApi/Program.cs` — log level, output template with correlation ID
 **Checkpoint**: US6 fully functional — health probes accurately reflect service state, every request traceable via correlation ID.
 
 ---

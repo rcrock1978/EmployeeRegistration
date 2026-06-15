@@ -29,7 +29,7 @@ For the latest implementation plan and feature context, read `specs/001-member-r
 - **Persistence**: `MembersDbContext` (optional `IEncryptionService`), `AuditInterceptor`, `MemberRepository` implementing `IMemberRepository`
 - **Auth**: JWT Bearer (dev symmetric key or OIDC provider), `HRAdminOnly` policy, `MemberOwnerAuthorizationFilter` for owner vs admin check
 - **Encryption**: AES-256-GCM via `AesGcmEncryptionService`, value converters applied in `OnModelCreating` for TIN/SSS/PrimaryId.Number
-- **Logging**: Structured with `CorrelationIdMiddleware` (X-Correlation-Id header), PII redaction (TIN/SSS patterns), `LoggingBehavior` pipeline
+- **Logging**: Structured with `CorrelationIdMiddleware` (X-Correlation-Id header), PII redaction (TIN/SSS patterns), `LoggingBehavior` pipeline, **Serilog** with daily rolling file sink (`logs/optodev-members-*.log`), per-member submission logs in JSON (`logs/members/{firstName}_{lastName}_{id}.log`)
 - **Health**: `/health/live` (200), `/health/ready` (200 DB ok / 503 DB down)
 - **OpenAPI**: Native + Scalar UI at `/scalar/v1` in development
 

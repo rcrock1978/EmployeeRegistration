@@ -21,9 +21,11 @@ public sealed partial class LoggingBehavior : IPipelineBehavior
         CancellationToken cancellationToken)
     {
         var requestName = request.GetType().Name;
+        var requestType = request.GetType().FullName;
         var sanitizedRequest = RedactPii(request);
 
-        _logger.LogInformation("Handling {RequestName}: {Request}", requestName, sanitizedRequest);
+        _logger.LogTrace(">>> Entering handler for {RequestName} ({RequestType})", requestName, requestType);
+        _logger.LogTrace("Request payload: {Request}", sanitizedRequest);
 
         var stopwatch = Stopwatch.StartNew();
         var result = await nextHandler();
@@ -31,11 +33,15 @@ public sealed partial class LoggingBehavior : IPipelineBehavior
 
         if (result.IsSuccess)
         {
+            _logger.LogTrace("<<< Exiting handler for {RequestName} — success in {ElapsedMs}ms",
+                requestName, stopwatch.ElapsedMilliseconds);
             _logger.LogInformation("Handled {RequestName} successfully in {ElapsedMs}ms",
                 requestName, stopwatch.ElapsedMilliseconds);
         }
         else
         {
+            _logger.LogTrace("<<< Exiting handler for {RequestName} — failed in {ElapsedMs}ms: {ErrorCode} - {ErrorMessage}",
+                requestName, stopwatch.ElapsedMilliseconds, result.Error?.Code, result.Error?.Message);
             _logger.LogWarning("Handled {RequestName} with failure in {ElapsedMs}ms: {ErrorCode} - {ErrorMessage}",
                 requestName, stopwatch.ElapsedMilliseconds, result.Error?.Code, result.Error?.Message);
         }

@@ -12,8 +12,22 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Verbose()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {CorrelationId,-36} {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: "logs/optodev-members-.log",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {CorrelationId} {Message:lj}{NewLine}{Exception}",
+        retainedFileCountLimit: 90)
+    .Enrich.FromLogContext()
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddOpenApi();
 
@@ -32,6 +46,7 @@ builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<Members.Domain.Members.IMemberRepository, Members.Infrastructure.Persistence.MemberRepository>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<MemberOwnerAuthorizationFilter>();
+builder.Services.AddScoped<IMemberSubmissionLogger, Members.Infrastructure.Logging.MemberSubmissionLogger>();
 
 var encryptionOptions = builder.Configuration
     .GetSection(EncryptionOptions.SectionName)
@@ -107,14 +122,11 @@ builder.Services.Scan(scan => scan
     .AsImplementedInterfaces()
     .WithScopedLifetime());
 
-builder.Logging.Configure(options =>
-{
-    options.ActivityTrackingOptions = ActivityTrackingOptions.TraceId | ActivityTrackingOptions.SpanId;
-});
-
 var app = builder.Build();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
+
+app.UseSerilogRequestLogging();
 
 app.UseExceptionHandler();
 
@@ -124,7 +136,10 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

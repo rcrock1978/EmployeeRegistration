@@ -76,7 +76,7 @@ Build the OPTODEV Member Registration platform: a responsive React single-page w
 | III. Explicit, Consistent Outcomes | Handlers return `Result<T>`; API uses uniform envelope; global exception handler maps to status codes | PASS |
 | IV. Validation at the Trust Boundary | FluentValidation pipeline runs before every command handler; client mirrors server rules | PASS |
 | V. Security & Privacy by Default | SPI encrypted at rest; no clear-text logs; RBAC; access logging; secrets from secrets manager; explicit consent gate | PASS |
-| VI. Observability & Operability | Structured request logging with correlation ID and PII redaction; audit interceptor; `/health/live` and `/health/ready` | PASS |
+| VI. Observability & Operability | Structured request logging with correlation ID and PII redaction; audit interceptor; `/health/live` and `/health/ready`; Serilog daily rolling file + per-member JSON logs | PASS |
 | VII. Quality via Tests | Domain/Application unit-testable without DB; integration tests with real Postgres; architecture tests | PASS |
 | VIII. Accessible, Low-Friction UX | 5-step wizard, inline validation, async submit, WCAG 2.1 AA, mobile-first, dark mode | PASS |
 | IX. Simplicity & YAGNI | No speculative abstractions; custom lightweight mediator chosen to avoid unnecessary licensing/complexity | PASS |
