@@ -1,3 +1,4 @@
+using System.Reflection;
 using Members.Application.Common.Results;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,9 +17,12 @@ public sealed class Sender : ISender
 
     public async Task<Result<TResponse>> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default)
     {
-        var handler = _serviceProvider.GetRequiredService<ICommandHandler<ICommand<TResponse>, TResponse>>();
+        var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResponse));
+        var handler = _serviceProvider.GetRequiredService(handlerType);
+        var handleMethod = handlerType.GetMethod("Handle", [command.GetType(), typeof(CancellationToken)])!;
 
-        Func<Task<Result<TResponse>>> execute = () => handler.Handle((dynamic)command, cancellationToken);
+        Func<Task<Result<TResponse>>> execute = () =>
+            (Task<Result<TResponse>>)handleMethod.Invoke(handler, [command, cancellationToken])!;
 
         foreach (var behavior in _pipelineBehaviors.Reverse())
         {
@@ -31,9 +35,12 @@ public sealed class Sender : ISender
 
     public async Task<Result<TResponse>> Send<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default)
     {
-        var handler = _serviceProvider.GetRequiredService<IQueryHandler<IQuery<TResponse>, TResponse>>();
+        var handlerType = typeof(IQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResponse));
+        var handler = _serviceProvider.GetRequiredService(handlerType);
+        var handleMethod = handlerType.GetMethod("Handle", [query.GetType(), typeof(CancellationToken)])!;
 
-        Func<Task<Result<TResponse>>> execute = () => handler.Handle((dynamic)query, cancellationToken);
+        Func<Task<Result<TResponse>>> execute = () =>
+            (Task<Result<TResponse>>)handleMethod.Invoke(handler, [query, cancellationToken])!;
 
         foreach (var behavior in _pipelineBehaviors.Reverse())
         {

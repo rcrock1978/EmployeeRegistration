@@ -17,6 +17,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new DateTimeUtcConverter());
+});
+
 builder.Services.AddProblemDetails();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -88,8 +93,8 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(Members.Application.Common.Results.Result).Assembly);
 
 #pragma warning disable CA2263
-builder.Services.AddSingleton(typeof(IPipelineBehavior), typeof(ValidationBehavior<>));
-builder.Services.AddSingleton(typeof(IPipelineBehavior), typeof(LoggingBehavior<>));
+builder.Services.AddScoped<IPipelineBehavior, ValidationBehavior>();
+builder.Services.AddScoped<IPipelineBehavior, LoggingBehavior>();
 #pragma warning restore CA2263
 builder.Services.AddScoped<ISender, Sender>();
 

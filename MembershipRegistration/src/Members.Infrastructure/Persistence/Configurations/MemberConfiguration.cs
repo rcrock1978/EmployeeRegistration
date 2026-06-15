@@ -13,7 +13,11 @@ public sealed class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
 
-        builder.Property(x => x.RowVersion).IsRowVersion();
+        builder.Property<uint>("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
+
         builder.Property(x => x.Status)
             .HasConversion<string>()
             .HasMaxLength(50);
@@ -68,8 +72,8 @@ public sealed class MemberConfiguration : IEntityTypeConfiguration<Member>
 
         builder.OwnsOne(x => x.GovernmentIds, gi =>
         {
-            gi.Property(p => p.Tin).HasMaxLength(50);
-            gi.Property(p => p.Sss).HasMaxLength(50);
+            gi.Property(p => p.Tin).HasMaxLength(200);
+            gi.Property(p => p.Sss).HasMaxLength(200);
         });
 
         builder.OwnsOne(x => x.PrimaryIdentification, pi =>

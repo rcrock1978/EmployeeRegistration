@@ -4,13 +4,13 @@ using Members.Application.Common.Messaging;
 
 namespace Members.Application.Common.Behaviors;
 
-public sealed class ValidationBehavior<TRequest> : IPipelineBehavior
+public sealed class ValidationBehavior : IPipelineBehavior
 {
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
+    private readonly IServiceProvider _serviceProvider;
 
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+    public ValidationBehavior(IServiceProvider serviceProvider)
     {
-        _validators = validators;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<Result<TResponse>> HandleAsync<TResponse>(
@@ -18,27 +18,41 @@ public sealed class ValidationBehavior<TRequest> : IPipelineBehavior
         Func<Task<Result<TResponse>>> nextHandler,
         CancellationToken cancellationToken)
     {
-        if (!_validators.Any())
+        var requestType = request.GetType();
+        var validatorType = typeof(IValidator<>).MakeGenericType(requestType);
+        var validator = _serviceProvider.GetService(validatorType) as IValidator;
+
+        if (validator is null)
             return await nextHandler();
 
-        var context = new ValidationContext<TRequest>((TRequest)request);
-        var failures = (await Task.WhenAll(
-            _validators.Select(v => v.ValidateAsync(context, cancellationToken))
-        ))
-        .SelectMany(r => r.Errors)
-        .Where(f => f is not null)
-        .ToList();
+        try
+        {
+            var contextType = typeof(ValidationContext<>).MakeGenericType(requestType);
+            var context = (IValidationContext)Activator.CreateInstance(contextType, request)!;
 
-        if (failures.Count == 0)
-            return await nextHandler();
+            var result = await validator.ValidateAsync(context, cancellationToken);
 
-        var errors = failures
-            .Select(f => new FieldError(f.PropertyName, f.ErrorCode, f.ErrorMessage))
-            .ToList();
+            if (result.IsValid)
+                return await nextHandler();
 
-        return Result.Failure<TResponse>(new AppError(
-            "Validation.Failed",
-            "One or more fields are invalid.",
-            errors));
+            var errors = result.Errors
+                .Select(f => new FieldError(f.PropertyName, f.ErrorCode, f.ErrorMessage))
+                .ToList();
+
+            return Result.Failure<TResponse>(new AppError(
+                "Validation.Failed",
+                "One or more fields are invalid.",
+                errors));
+        }
+        catch (NullReferenceException)
+        {
+            return Result.Failure<TResponse>(new AppError(
+                "Validation.Failed",
+                "The request body is missing required fields.",
+                new List<FieldError>
+                {
+                    new("request", "Required", "The request body must contain all required fields.")
+                }));
+        }
     }
 }

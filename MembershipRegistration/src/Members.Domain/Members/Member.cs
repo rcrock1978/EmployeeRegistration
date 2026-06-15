@@ -5,7 +5,6 @@ namespace Members.Domain.Members;
 public class Member : AuditableEntity
 {
     public Guid Id { get; private set; }
-    public byte[] RowVersion { get; private set; } = [];
     public MemberStatus Status { get; private set; }
     public string EmailAddress { get; private set; } = string.Empty;
 

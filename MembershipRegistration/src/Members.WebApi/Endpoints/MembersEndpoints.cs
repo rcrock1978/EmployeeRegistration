@@ -6,6 +6,7 @@ using Members.Application.Features.Members.UpdateMember;
 using Members.Application.Common.Messaging;
 using Members.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Members.WebApi.Endpoints;
 
@@ -131,7 +132,22 @@ public static class MembersEndpoints
                 });
             }
 
-            var result = await sender.Send(command, cancellationToken);
+            Result<UpdateMemberResponse> result;
+            try
+            {
+                result = await sender.Send(command, cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Results.Conflict(new
+                {
+                    isSuccess = false,
+                    value = (object?)null,
+                    error = new AppError(
+                        "Conflict.Concurrency",
+                        "This record was modified by another user. Reload and try again.")
+                });
+            }
 
             if (result.IsSuccess)
             {

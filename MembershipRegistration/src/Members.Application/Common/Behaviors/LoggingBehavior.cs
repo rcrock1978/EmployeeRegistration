@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Members.Application.Common.Behaviors;
 
-public sealed partial class LoggingBehavior<TRequest> : IPipelineBehavior
+public sealed partial class LoggingBehavior : IPipelineBehavior
 {
-    private readonly ILogger<LoggingBehavior<TRequest>> _logger;
+    private readonly ILogger<LoggingBehavior> _logger;
 
-    public LoggingBehavior(ILogger<LoggingBehavior<TRequest>> logger)
+    public LoggingBehavior(ILogger<LoggingBehavior> logger)
     {
         _logger = logger;
     }
