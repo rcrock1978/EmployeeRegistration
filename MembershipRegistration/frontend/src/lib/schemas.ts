@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const tinPattern = /^\d{3}-\d{3}-\d{3}-\d{3}$/;
 const sssPattern = /^\d{2}-\d{7}-\d{1}$/;
